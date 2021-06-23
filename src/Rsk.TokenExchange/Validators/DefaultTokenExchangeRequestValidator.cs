@@ -12,11 +12,15 @@ namespace Rsk.TokenExchange.Validators
     {
         private readonly ISubjectTokenValidator subjectTokenValidator;
 
+        /// <summary>
+        /// Creates a new DefaultTokenExchangeRequestValidator.
+        /// </summary>
         public DefaultTokenExchangeRequestValidator(ISubjectTokenValidator subjectTokenValidator)
         {
             this.subjectTokenValidator = subjectTokenValidator ?? throw new ArgumentNullException(nameof(subjectTokenValidator));
         }
-        
+
+        /// <inheritdoc />
         public async Task<ITokenExchangeValidationResult> Validate(ITokenExchangeRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
@@ -25,8 +29,8 @@ namespace Rsk.TokenExchange.Validators
             var result = await subjectTokenValidator.Validate(request.SubjectToken, request.SubjectTokenType);
 
             // validate that the requestor is an intended audience of the subject token
-            var audiences = result.Claims.Where(x => x.Type == "aud");
-            if (audiences == null || audiences.All(x => x.Value != request.ClientId))
+            var audiences = result.Claims.Where(x => x.Type == "aud").ToList();
+            if (audiences.All(x => x.Value != request.ClientId))
             {
                 return TokenExchangeValidationResult.Failure("Requestor is not a valid audience of the subject token");
             }

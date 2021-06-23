@@ -10,7 +10,6 @@ namespace Rsk.TokenExchange.Validators
         /// <summary>
         /// Validates the subject token
         /// </summary>
-        /// <param name="subject"></param>
         /// <param name="token">the subject token (subject_token)</param>
         /// <param name="tokenType">the subject token type (subject_token_type)</param>
         /// <returns>Validation result</returns>

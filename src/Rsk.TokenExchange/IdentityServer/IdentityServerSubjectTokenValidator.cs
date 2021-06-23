@@ -15,6 +15,9 @@ namespace Rsk.TokenExchange.IdentityServer
         private readonly ITokenValidator tokenValidator;
         private readonly ILogger<ISubjectTokenValidator> logger;
 
+        /// <summary>
+        /// Creates a new IdentityServerSubjectTokenValidator
+        /// </summary>
         public IdentityServerSubjectTokenValidator(ITokenValidator tokenValidator, ILogger<ISubjectTokenValidator> logger)
         {
             this.tokenValidator = tokenValidator ?? throw new ArgumentNullException(nameof(tokenValidator));

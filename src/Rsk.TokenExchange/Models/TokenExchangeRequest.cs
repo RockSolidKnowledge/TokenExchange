@@ -8,6 +8,12 @@ namespace Rsk.TokenExchange
 {
     public class TokenExchangeRequest : ITokenExchangeRequest
     {
+        /// <summary>
+        /// Parses a token exchange token exchange request from a NameValueCollection. 
+        /// </summary>
+        /// <param name="clientId">The ID of the client (client_id) that made the token exchange request.</param>
+        /// <param name="request">The NameValueCollection containing the request parameters</param>
+        /// <exception cref="InvalidRequestException">Throw on missing grant_type, subject_token, and subject_token_type.</exception>
         public TokenExchangeRequest(string clientId, NameValueCollection request)
         {
             if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentNullException(nameof(clientId));
@@ -41,22 +47,44 @@ namespace Rsk.TokenExchange
             RequestedTokenType = request[TokenExchangeConstants.RequestParameters.RequestedTokenType];
         }
 
+        /// <inheritdoc />
         public string ClientId { get; set; }
+        
+        /// <inheritdoc />
         public string GrantType { get; }
         
+        
+        /// <inheritdoc />
         public string Resource { get; }
+        
+        /// <inheritdoc />
         public string Audience { get; }
+        
+        /// <inheritdoc />
         public IEnumerable<string> Scope { get; }
         
+        
+        /// <inheritdoc />
         public string RequestedTokenType { get; }
         
+        
+        /// <inheritdoc />
         public string SubjectToken { get; }
+        
+        /// <inheritdoc />
         public string SubjectTokenType { get; }
         
+        
+        /// <inheritdoc />
         public string ActorToken { get; }
+        
+        /// <inheritdoc />
         public string ActorTokenType { get; }
     }
 
+    /// <summary>
+    /// Represents the token exchange request.
+    /// </summary>
     public interface ITokenExchangeRequest
     {
         /// <summary>

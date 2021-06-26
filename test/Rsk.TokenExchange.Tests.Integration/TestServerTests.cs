@@ -52,7 +52,7 @@ namespace Rsk.TokenExchange.Tests.Integration
         }
         
         [Fact]
-        public async Task TokenExchange_WhenUnauthorizedApiSwapsToken_ExpectSuccessfulTokenExchange()
+        public async Task TokenExchange_WhenUnauthorizedApiSwapsToken_ExpectFailure()
         {
             var client = factory.CreateClient();
 

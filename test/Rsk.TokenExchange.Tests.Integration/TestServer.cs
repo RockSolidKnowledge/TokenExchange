@@ -43,6 +43,8 @@ namespace Rsk.TokenExchange.Tests.Integration
             RequireClientSecret = false,
             AllowedGrantTypes = GrantTypes.ClientCredentials,
             AllowedScopes = new[] {"api1", "api2"},
+            
+            // pretending this is a token from a user interactive flow
             Claims = new[] {new ClientClaim("sub", "1")},
             ClientClaimsPrefix = null
         };

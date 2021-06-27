@@ -20,10 +20,11 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
     {
         private Mock<ITokenExchangeRequestParser> mockParser = new Mock<ITokenExchangeRequestParser>();
         private Mock<ITokenExchangeRequestValidator> mockRequestValidator = new Mock<ITokenExchangeRequestValidator>();
+        private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new Mock<ITokenExchangeClaimsParser>();
         private ILogger<TokenExchangeExtensionGrantValidator> logger = new NullLogger<TokenExchangeExtensionGrantValidator>();
 
         private TokenExchangeExtensionGrantValidator CreateSut()
-            => new TokenExchangeExtensionGrantValidator(mockParser?.Object, mockRequestValidator?.Object, logger);
+            => new TokenExchangeExtensionGrantValidator(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
 
         [Fact]
         public void ctor_WhenParserIsNull_ExpectArgumentNullException()
@@ -36,6 +37,13 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         public void ctor_WhenTokenValidatorIsNull_ExpectArgumentNullException()
         {
             mockRequestValidator = null;
+            Assert.Throws<ArgumentNullException>(CreateSut);
+        }
+
+        [Fact]
+        public void ctor_WhenClaimsParserIsNull_ExpectArgumentNullException()
+        {
+            mockClaimsParser = null;
             Assert.Throws<ArgumentNullException>(CreateSut);
         }
         
@@ -149,8 +157,8 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
             context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == nameClaim.Type && x.Value == nameClaim.Value);
         }
 
-        [Fact]
-        public async Task ValidateAsync_WhenTokenIsValidAndIssuedToClientApp_ExpectSuccessResultWithSubClaimSetToClientId()
+        [Fact] // TODO
+        public async Task ValidateAsync_WhenTokenIsValidButContainsNoSubClaim_ExpectFailure()
         {
             var context = new ExtensionGrantValidationContext
             {

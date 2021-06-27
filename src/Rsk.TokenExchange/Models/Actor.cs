@@ -22,7 +22,7 @@ namespace Rsk.TokenExchange
         /// The inner actor claim.
         /// Useful for multiple token exchange requests.
         /// </summary>
-        public Actor InnerActor { get; set; }
+        public string InnerActor { get; set; }
         
     }
 }

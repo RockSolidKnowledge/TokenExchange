@@ -82,6 +82,7 @@ namespace Rsk.TokenExchange.Tests.Integration
             services.AddTransient<ITokenExchangeRequestParser, TokenExchangeRequestParser>();
             services.AddTransient<ITokenExchangeRequestValidator, DefaultTokenExchangeRequestValidator>();
             services.AddTransient<ISubjectTokenValidator, IdentityServerSubjectTokenValidator>();
+            services.AddTransient<ITokenExchangeClaimsParser, TokenExchangeClaimsParser>();
         }
 
         public void Configure(IApplicationBuilder app)

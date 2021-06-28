@@ -23,6 +23,15 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new Mock<ITokenExchangeClaimsParser>();
         private ILogger<TokenExchangeExtensionGrantValidator> logger = new NullLogger<TokenExchangeExtensionGrantValidator>();
 
+        private ExtensionGrantValidationContext context = new ExtensionGrantValidationContext
+        {
+            Request = new ValidatedTokenRequest
+            {
+                ClientId = "123",
+                Raw = new NameValueCollection {{TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType}}
+            }
+        };
+        
         private TokenExchangeExtensionGrantValidator CreateSut()
             => new TokenExchangeExtensionGrantValidator(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
 
@@ -71,16 +80,8 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
             const string expectedError = "invalid_grant"; // TokenRequestErrors.InvalidGrant
             const string expectedErrorMessage = "message from exception";
 
-            var context = new ExtensionGrantValidationContext
-            {
-                Request = new ValidatedTokenRequest
-                {
-                    ClientId = "123",
-                    Raw = new NameValueCollection {{TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType}}
-                }
-            };
-
-            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw)).Throws(new InvalidRequestException(expectedErrorMessage));
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Throws(new InvalidRequestException(expectedErrorMessage));
             var sut = CreateSut();
 
             await sut.ValidateAsync(context);
@@ -96,17 +97,9 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
             const string expectedError = "invalid_grant"; // TokenRequestErrors.InvalidGrant
             const string expectedErrorMessage = "Invalid subject token";
 
-            var context = new ExtensionGrantValidationContext
-            {
-                Request = new ValidatedTokenRequest
-                {
-                    ClientId = "123",
-                    Raw = new NameValueCollection {{TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType}}
-                }
-            };
-            
             var mockRequest = new Mock<ITokenExchangeRequest>();
-            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw)).Returns(mockRequest.Object);
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Returns(mockRequest.Object);
             mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
                 .ReturnsAsync(TokenExchangeValidationResult.Failure());
             
@@ -120,24 +113,74 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         }
 
         [Fact]
-        public async Task ValidateAsync_WhenTokenIsValidAndIssuedToUser_ExpectSuccessResultWithTokenExchangeDefaults()
+        public async Task ValidateAsync_WhenParseSubjectThrowsTokenExchangeException_ExpectFailureResult()
         {
-            var context = new ExtensionGrantValidationContext
-            {
-                Request = new ValidatedTokenRequest
-                {
-                    ClientId = "123",
-                    Raw = new NameValueCollection {{TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType}}
-                }
-            };
+            const string expectedError = "invalid_grant"; // TokenRequestErrors.InvalidGrant
 
-            var subjectClaim = new Claim("sub", "123");
-            var nameClaim = new Claim("name", "alice");
+            var claims = new List<Claim> {new Claim("sub", "123")};
+            var exception = new SubjectParsingException("error!");
             
             var mockRequest = new Mock<ITokenExchangeRequest>();
-            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw)).Returns(mockRequest.Object);
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Returns(mockRequest.Object);
             mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
-                .ReturnsAsync(TokenExchangeValidationResult.Success(new[] {subjectClaim, nameClaim}));
+                .ReturnsAsync(TokenExchangeValidationResult.Success(claims));
+            mockClaimsParser.Setup(x => x.ParseSubject(claims, mockRequest.Object))
+                .Throws(exception);
+            
+            var sut = CreateSut();
+
+            await sut.ValidateAsync(context);
+
+            context.Result.IsError.Should().BeTrue();
+            context.Result.Error.Should().Be(expectedError);
+            context.Result.ErrorDescription.Should().Contain(exception.GetType().ToString());
+            context.Result.ErrorDescription.Should().Contain(exception.Message);
+        }
+
+        [Fact]
+        public async Task ValidateAsync_WhenParseSubjectReturnsNull_ExpectFailureResult()
+        {
+            const string expectedError = "invalid_grant"; // TokenRequestErrors.InvalidGrant
+            const string expectedErrorMessage = "Unable to parse subject claim";
+
+            var claims = new List<Claim> {new Claim("sub", "123")};
+            
+            var mockRequest = new Mock<ITokenExchangeRequest>();
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Returns(mockRequest.Object);
+            mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
+                .ReturnsAsync(TokenExchangeValidationResult.Success(claims));
+            mockClaimsParser.Setup(x => x.ParseSubject(claims, mockRequest.Object))
+                .ReturnsAsync((string) null);
+            
+            var sut = CreateSut();
+
+            await sut.ValidateAsync(context);
+
+            context.Result.IsError.Should().BeTrue();
+            context.Result.Error.Should().Be(expectedError);
+            context.Result.ErrorDescription.Should().Contain(expectedErrorMessage);
+        }
+
+        [Fact]
+        public async Task ValidateAsync_WhenTokenIsValidAndIssuedToUser_ExpectSuccessResultWithTokenExchangeDefaults()
+        {
+            var subjectClaim = new Claim("sub", "123");
+            var nameClaim = new Claim("name", "alice");
+            var claims = new List<Claim>{subjectClaim, nameClaim};
+
+            var expectedAdditionalClaim = new Claim("act", "test");
+            
+            var mockRequest = new Mock<ITokenExchangeRequest>();
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Returns(mockRequest.Object);
+            mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
+                .ReturnsAsync(TokenExchangeValidationResult.Success(claims));
+            mockClaimsParser.Setup(x => x.ParseSubject(claims, mockRequest.Object))
+                .ReturnsAsync(subjectClaim.Value);
+            mockClaimsParser.Setup(x => x.ParseClaims(claims, mockRequest.Object))
+                .ReturnsAsync(new[] {expectedAdditionalClaim});
 
             var sut = CreateSut();
 
@@ -154,31 +197,7 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
                 TokenExchangeConstants.TokenTypes.AccessToken));
             
             context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == subjectClaim.Type && x.Value == subjectClaim.Value);
-            context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == nameClaim.Type && x.Value == nameClaim.Value);
+            context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == expectedAdditionalClaim.Type && x.Value == expectedAdditionalClaim.Value);
         }
-
-        [Fact] // TODO
-        public async Task ValidateAsync_WhenTokenIsValidButContainsNoSubClaim_ExpectFailure()
-        {
-            var context = new ExtensionGrantValidationContext
-            {
-                Request = new ValidatedTokenRequest
-                {
-                    ClientId = "123",
-                    Raw = new NameValueCollection {{"grant_type", TokenExchangeConstants.GrantType}}
-                }
-            };
-
-            var mockRequest = new Mock<ITokenExchangeRequest>();
-            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw)).Returns(mockRequest.Object);
-            mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
-                .ReturnsAsync(TokenExchangeValidationResult.Success(new List<Claim>()));
-
-            var sut = CreateSut();
-
-            await sut.ValidateAsync(context);
-
-            context.Result.Subject.FindFirstValue("sub").Should().Be(context.Request.ClientId);
-        } 
     }
 }

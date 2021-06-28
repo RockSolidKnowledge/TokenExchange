@@ -1,11 +1,20 @@
 namespace Rsk.TokenExchange
 {
-    public class TokenExchangeConstants
+    /// <summary>
+    /// Constants for OAuth Token Exchange (RFC 8693).
+    /// </summary>
+    public static class TokenExchangeConstants
     {
+        /// <summary>
+        /// grant_type reserved for OAuth Token Exchange.
+        /// </summary>
         public const string GrantType = "urn:ietf:params:oauth:grant-type:token-exchange";
 
-        // https://www.rfc-editor.org/rfc/rfc8693.html#name-request
-        public class RequestParameters
+        /// <summary>
+        /// Token request parameters for OAuth Token Exchange.
+        /// https://www.rfc-editor.org/rfc/rfc8693.html#name-request.
+        /// </summary>
+        public static class RequestParameters
         {
             public const string GrantType = "grant_type";
             public const string Resource = "resource";
@@ -18,13 +27,24 @@ namespace Rsk.TokenExchange
             public const string ActorTokenType = "actor_token_type";
         }
 
-        public class ResponseParameters
+        /// <summary>
+        /// Custom token response parameters for OAuth Token Exchange.
+        /// https://www.rfc-editor.org/rfc/rfc8693.html#name-successful-response.
+        /// </summary>
+        public static class ResponseParameters
         {
+            /// <summary>
+            /// REQUIRED. An identifier for the representation of the issued security token.
+            /// Should use a value from <see cref="TokenTypes"/>.
+            /// </summary>
             public const string IssuedTokenType = "issued_token_type";
         }
         
-        // https://www.rfc-editor.org/rfc/rfc8693.html#name-token-type-identifiers
-        public class TokenTypes
+        /// <summary>
+        /// The type of token being exchanged or generated as the result of exchange.
+        /// https://www.rfc-editor.org/rfc/rfc8693.html#name-token-type-identifiers.
+        /// </summary>
+        public static class TokenTypes
         {
             public const string AccessToken = "urn:ietf:params:oauth:token-type:access_token";
             public const string RefreshToken = "urn:ietf:params:oauth:token-type:refresh_token";

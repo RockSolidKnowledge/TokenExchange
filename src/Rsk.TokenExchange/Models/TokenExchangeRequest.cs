@@ -6,6 +6,7 @@ using Rsk.TokenExchange.Exceptions;
 
 namespace Rsk.TokenExchange
 {
+    /// <inheritdoc />
     public class TokenExchangeRequest : ITokenExchangeRequest
     {
         /// <summary>
@@ -48,11 +49,10 @@ namespace Rsk.TokenExchange
         }
 
         /// <inheritdoc />
-        public string ClientId { get; set; }
+        public string ClientId { get; }
         
         /// <inheritdoc />
         public string GrantType { get; }
-        
         
         /// <inheritdoc />
         public string Resource { get; }
@@ -63,17 +63,14 @@ namespace Rsk.TokenExchange
         /// <inheritdoc />
         public IEnumerable<string> Scope { get; }
         
-        
         /// <inheritdoc />
         public string RequestedTokenType { get; }
-        
         
         /// <inheritdoc />
         public string SubjectToken { get; }
         
         /// <inheritdoc />
         public string SubjectTokenType { get; }
-        
         
         /// <inheritdoc />
         public string ActorToken { get; }
@@ -95,6 +92,7 @@ namespace Rsk.TokenExchange
         
         /// <summary>
         /// REQUIRED.
+        /// The OAuth grant type.
         /// Must be "urn:ietf:params:oauth:grant-type:token-exchange".
         /// </summary>
         string GrantType { get; }
@@ -102,51 +100,55 @@ namespace Rsk.TokenExchange
         /// <summary>
         /// OPTIONAL.
         /// A URI indicating the resource where the requester intends to use the token.
-        /// Unsupported.
         /// </summary>
         string Resource { get; }
         
         /// <summary>
         /// OPTIONAL.
         /// The name of the resource where the requester intends to use the token.
-        /// Maps to an ApiResource in IdentityServer4.
+        /// Maps to an ApiResource in IdentityServer.
         /// </summary>
         string Audience { get; }
         
         /// <summary>
         /// OPTIONAL.
         /// The scope of the requested token.
-        /// Maps to ApiScopes in IdentityServer4.
+        /// Maps to ApiScopes in IdentityServer.
         /// </summary>
         IEnumerable<string> Scope { get; }
         
         /// <summary>
         /// OPTIONAL.
-        /// The type of the requested token, as described in rfc 8693 section 3.
+        /// The type of the requested token.
+        /// RFC 8693 defines some known <see cref="TokenExchangeConstants.TokenTypes"/>.
         /// </summary>
         string RequestedTokenType { get; }
         
         /// <summary>
         /// REQUIRED.
-        /// The token representing the identity of the requester.
+        /// The token representing the identity of the party the request is being made on behalf of.
+        /// Typically, the subject of this token will be the subject of the token issued in response to the request.
         /// </summary>
         string SubjectToken { get; }
         
         /// <summary>
         /// REQUIRED.
-        /// The type of the subject token, as described in rfc 8693 section 3.
+        /// The type of the subject token.
+        /// RFC 8693 defines some known <see cref="TokenExchangeConstants.TokenTypes"/>.
         /// </summary>
         string SubjectTokenType { get; }
         
         /// <summary>
         /// OPTIONAL.
-        /// The token representing the identity of the party the request is being made on behalf of.
+        /// The token that represents the identity of the acting party.
+        /// Typically, this will be the party that is authorized to use the requested token and act on behalf of the subject.
         /// </summary>
         string ActorToken { get; }
         
         /// <summary>
         /// REQUIRED when actor token is present.
-        /// The type of the actor token, as described in rfc 8693 section 3.
+        /// The type of the actor token.
+        /// RFC 8693 defines some known <see cref="TokenExchangeConstants.TokenTypes"/>.
         /// </summary>
         string ActorTokenType { get; }
     }

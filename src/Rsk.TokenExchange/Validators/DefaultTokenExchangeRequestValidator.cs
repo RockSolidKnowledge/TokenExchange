@@ -28,7 +28,7 @@ namespace Rsk.TokenExchange.Validators
             // validate subject token is issued by IdentityServer
             var result = await subjectTokenValidator.Validate(request.SubjectToken, request.SubjectTokenType);
 
-            // validate that the requestor is an intended audience of the subject token
+            // validate that the requester is an intended audience of the subject token
             var audiences = result.Claims.Where(x => x.Type == "aud").ToList();
             if (audiences.All(x => x.Value != request.ClientId))
             {

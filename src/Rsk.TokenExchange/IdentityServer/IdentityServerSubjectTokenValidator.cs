@@ -7,7 +7,7 @@ using Rsk.TokenExchange.Validators;
 namespace Rsk.TokenExchange.IdentityServer
 {
     /// <summary>
-    /// Wrapper around IdentityServer4's ITokenValidator
+    /// Wrapper around IdentityServer's ITokenValidator
     /// Returns success for any token issued by IdentityServer.
     /// </summary>
     public class IdentityServerSubjectTokenValidator : ISubjectTokenValidator

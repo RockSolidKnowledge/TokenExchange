@@ -20,6 +20,13 @@ namespace Rsk.TokenExchange.IdentityServer
         private readonly ITokenExchangeClaimsParser claimsParser;
         private readonly ILogger<TokenExchangeExtensionGrantValidator> logger;
 
+        /// <summary>
+        /// Creates a new <see cref="TokenExchangeExtensionGrantValidator"/>.
+        /// </summary>
+        /// <param name="parser">Parser for understanding token exchange requests.</param>
+        /// <param name="requestValidator">Validator for the token exchange request.</param>
+        /// <param name="claimsParser">Parser for generating the subject claim and additional claims for the subject.</param>
+        /// <param name="logger">The logger.</param>
         public TokenExchangeExtensionGrantValidator(
             ITokenExchangeRequestParser parser,
             ITokenExchangeRequestValidator requestValidator,
@@ -31,9 +38,12 @@ namespace Rsk.TokenExchange.IdentityServer
             this.claimsParser = claimsParser ?? throw new ArgumentNullException(nameof(claimsParser));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
+        /// <inheritdoc />
+        /// <value>urn:ietf:params:oauth:grant-type:token-exchange</value>
         public string GrantType => TokenExchangeConstants.GrantType;
-        
+
+        /// <inheritdoc />
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
             // warn on no client auth

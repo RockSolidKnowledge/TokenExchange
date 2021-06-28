@@ -21,7 +21,6 @@ namespace Rsk.TokenExchange.Tests.Validators
         [Fact]
         public void Success_WhenCustomClaimsIncluded_ExpectCorrectProperties()
         {
-            const string expectedSubject = "123";
             var claims = new List<Claim> {new Claim("name", "alice")};
 
             var result = TokenExchangeValidationResult.Success(claims);

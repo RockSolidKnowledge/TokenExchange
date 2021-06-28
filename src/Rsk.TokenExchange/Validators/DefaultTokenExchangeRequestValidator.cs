@@ -6,7 +6,7 @@ namespace Rsk.TokenExchange.Validators
 {
     /// <summary>
     /// Default implementation of ITokenExchangeRequestValidator.
-    /// Validates the subject token, expecting an access token, issued by this authorization server, that has an audience of the requesting client.
+    /// Validates the subject token, expecting an access token, issued by this authorization server, that has an audience or client_id of the requesting client.
     /// </summary>
     public class DefaultTokenExchangeRequestValidator : ITokenExchangeRequestValidator
     {
@@ -30,9 +30,10 @@ namespace Rsk.TokenExchange.Validators
 
             // validate that the requester is an intended audience of the subject token
             var audiences = result.Claims.Where(x => x.Type == "aud").ToList();
-            if (audiences.All(x => x.Value != request.ClientId))
+            var clientId = result.Claims.FirstOrDefault(x => x.Type == "client_id");
+            if (audiences.All(x => x.Value != request.ClientId) && clientId?.Value != request.ClientId)
             {
-                return TokenExchangeValidationResult.Failure("Requestor is not a valid audience of the subject token");
+                return TokenExchangeValidationResult.Failure("Requester must be a recipient of the subject token");
             }
 
             return result.IsValid 

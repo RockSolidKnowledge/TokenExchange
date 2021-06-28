@@ -98,7 +98,33 @@ namespace Rsk.TokenExchange.Tests.Validators
         }
 
         [Fact]
-        public async Task Validate_WhenSubjectTokenIsValidWithCorrectAudience_ExpectSuccessResult()
+        public async Task Validate_WhenSubjectTokenIsValidAndAuthorizedWithCorrectClientId_ExpectSuccessResult()
+        {
+            const string validClientId = "app1";
+            
+            var expectedClaims = new List<Claim>
+            {
+                new Claim("sub", "123"),
+                new Claim("name", "alice"),
+                new Claim("client_id", validClientId),
+                new Claim("aud", "api1")
+            };
+            
+            mockRequest.Setup(x => x.ClientId).Returns(validClientId);
+            
+            mockSubjectTokenResponse.Setup(x => x.IsValid).Returns(true);
+            mockSubjectTokenResponse.Setup(x => x.Claims).Returns(expectedClaims);
+
+            var sut = CreateSut();
+            var result = await sut.Validate(mockRequest.Object);
+
+            result.IsValid.Should().BeTrue();
+            result.Claims.Should().BeSameAs(expectedClaims);
+            result.ErrorDescription.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task Validate_WhenSubjectTokenIsValidAndAuthorizedWithCorrectAudience_ExpectSuccessResult()
         {
             const string validAudience = "api1";
             
@@ -123,7 +149,7 @@ namespace Rsk.TokenExchange.Tests.Validators
         }
 
         [Fact]
-        public async Task Validate_WhenSubjectTokenIsValidWithCorrectAudienceAndMultipleAudiences_ExpectSuccessResult()
+        public async Task Validate_WhenSubjectTokenIsValidAndAuthorizedWithCorrectAudienceAndMultipleAudiences_ExpectSuccessResult()
         {
             const string validAudience = "api1";
             

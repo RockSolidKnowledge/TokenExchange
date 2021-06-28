@@ -3,32 +3,31 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
-using IdentityServer4.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Rsk.TokenExchange.IdentityServer;
 using Rsk.TokenExchange.Validators;
+using Rsk.TokenExchange.Validators.Adaptors;
 using Xunit;
 
-namespace Rsk.TokenExchange.Tests.IdentityServer
+namespace Rsk.TokenExchange.Tests.Validators
 {
-    public class IdentityServerSubjectTokenValidatorTests
+    public class DefaultSubjectTokenValidatorTests
     {
-        private Mock<ITokenValidator> mockTokenValidator = new Mock<ITokenValidator>();
+        private Mock<ITokenValidatorAdaptor> mockTokenValidator = new Mock<ITokenValidatorAdaptor>();
         private ILogger<ISubjectTokenValidator> logger = new NullLogger<ISubjectTokenValidator>();
 
         private const string validToken = "eyJ.eyJ";
         private const string validTokenType = TokenExchangeConstants.TokenTypes.AccessToken;
 
-        public IdentityServerSubjectTokenValidatorTests()
+        public DefaultSubjectTokenValidatorTests()
         {
-            mockTokenValidator.Setup(x => x.ValidateAccessTokenAsync(validToken, null))
-                .ReturnsAsync(new TokenValidationResult {IsError = false, Claims = new List<Claim>()});
+            mockTokenValidator.Setup(x => x.ValidateAccessToken(validToken))
+                .ReturnsAsync(new TokenValidationResult(false, new List<Claim>()));
         }
         
-        private IdentityServerSubjectTokenValidator CreateSut() 
-            => new IdentityServerSubjectTokenValidator(mockTokenValidator?.Object, logger);
+        private DefaultSubjectTokenValidator CreateSut() 
+            => new DefaultSubjectTokenValidator(mockTokenValidator?.Object, logger);
 
         [Fact]
         public void ctor_WhenTokenValidatorIsNull_ExpectArgumentNullException()
@@ -73,8 +72,8 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         {
             var token = Guid.NewGuid().ToString();
 
-            mockTokenValidator.Setup(x => x.ValidateAccessTokenAsync(token, null))
-                .ReturnsAsync(new TokenValidationResult {IsError = true});
+            mockTokenValidator.Setup(x => x.ValidateAccessToken(token))
+                .ReturnsAsync(new TokenValidationResult(true));
             var sut = CreateSut();
 
             var result = await sut.Validate(token, validTokenType);
@@ -99,8 +98,8 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         {
             var claims = new[] {new Claim("sub", "123"), new Claim("name", "alice")};
 
-            mockTokenValidator.Setup(x => x.ValidateAccessTokenAsync(validToken, null))
-                .ReturnsAsync(new TokenValidationResult {IsError = false, Claims = claims});
+            mockTokenValidator.Setup(x => x.ValidateAccessToken(validToken))
+                .ReturnsAsync(new TokenValidationResult(false, claims));
             var sut = CreateSut();
 
             var result = await sut.Validate(validToken, validTokenType);

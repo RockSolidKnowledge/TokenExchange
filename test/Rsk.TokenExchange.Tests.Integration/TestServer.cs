@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Rsk.TokenExchange.IdentityServer;
 using Rsk.TokenExchange.Validators;
+using Rsk.TokenExchange.Validators.Adaptors;
 
 namespace Rsk.TokenExchange.Tests.Integration
 {
@@ -81,8 +82,11 @@ namespace Rsk.TokenExchange.Tests.Integration
             builder.AddExtensionGrantValidator<TokenExchangeExtensionGrantValidator>();
             services.AddTransient<ITokenExchangeRequestParser, TokenExchangeRequestParser>();
             services.AddTransient<ITokenExchangeRequestValidator, DefaultTokenExchangeRequestValidator>();
-            services.AddTransient<ISubjectTokenValidator, IdentityServerSubjectTokenValidator>();
             services.AddTransient<ITokenExchangeClaimsParser, TokenExchangeClaimsParser>();
+            
+            
+            services.AddTransient<ISubjectTokenValidator, DefaultSubjectTokenValidator>();
+            services.AddTransient<ITokenValidatorAdaptor, IdentityServerSubjectTokenValidator>();
         }
 
         public void Configure(IApplicationBuilder app)

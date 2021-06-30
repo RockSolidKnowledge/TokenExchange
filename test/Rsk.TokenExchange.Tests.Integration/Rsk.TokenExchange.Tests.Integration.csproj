@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Rsk.TokenExchange.IdentityServer4\Rsk.TokenExchange.IdentityServer4.csproj" />
       <ProjectReference Include="..\..\src\Rsk.TokenExchange\Rsk.TokenExchange.csproj" />
     </ItemGroup>
 

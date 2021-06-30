@@ -4,13 +4,13 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Duende.IdentityServer.Validation;
 using FluentAssertions;
-using IdentityServer4.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Rsk.TokenExchange.DuendeIdentityServer;
 using Rsk.TokenExchange.Exceptions;
-using Rsk.TokenExchange.IdentityServer;
 using Rsk.TokenExchange.Validators;
 using Xunit;
 

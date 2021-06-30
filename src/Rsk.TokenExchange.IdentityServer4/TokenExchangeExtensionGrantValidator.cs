@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
 
-namespace Rsk.TokenExchange.IdentityServer
+namespace Rsk.TokenExchange.IdentityServer4
 {
     /// <summary>
     /// Extension grant validator for OAuth Token Exchange (RFC 8693).

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Rsk.TokenExchange.IdentityServer;
+using Rsk.TokenExchange.IdentityServer4;
 using Rsk.TokenExchange.Validators;
 using Rsk.TokenExchange.Validators.Adaptors;
 
@@ -77,16 +77,8 @@ namespace Rsk.TokenExchange.Tests.Integration
                 .AddTestUsers(new List<TestUser> {Alice, Bob})
                 .AddSigningCredential(
                     new ECDsaSecurityKey(ECDsa.Create(ECCurve.NamedCurves.nistP256)),
-                    IdentityServerConstants.ECDsaSigningAlgorithm.ES256);
-
-            builder.AddExtensionGrantValidator<TokenExchangeExtensionGrantValidator>();
-            services.AddTransient<ITokenExchangeRequestParser, TokenExchangeRequestParser>();
-            services.AddTransient<ITokenExchangeRequestValidator, DefaultTokenExchangeRequestValidator>();
-            services.AddTransient<ITokenExchangeClaimsParser, TokenExchangeClaimsParser>();
-            
-            
-            services.AddTransient<ISubjectTokenValidator, DefaultSubjectTokenValidator>();
-            services.AddTransient<ITokenValidatorAdaptor, IdentityServerSubjectTokenValidator>();
+                    IdentityServerConstants.ECDsaSigningAlgorithm.ES256)
+                .AddTokenExchange();
         }
 
         public void Configure(IApplicationBuilder app)

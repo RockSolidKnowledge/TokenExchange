@@ -69,7 +69,7 @@ namespace Rsk.TokenExchange.Tests.Integration
         
         public void ConfigureServices(IServiceCollection services)
         {
-            var builder = services.AddIdentityServer()
+            services.AddIdentityServer()
                 .AddInMemoryClients(new[] {Client, ApiClient})
                 .AddInMemoryApiResources(new[] {Api1, Api2})
                 .AddInMemoryApiScopes(new[] {ApiScope1, ApiScope2})

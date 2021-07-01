@@ -12,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Rsk.TokenExchange.IdentityServer4;
-using Rsk.TokenExchange.Validators;
-using Rsk.TokenExchange.Validators.Adaptors;
 
 namespace Rsk.TokenExchange.Tests.Integration
 {

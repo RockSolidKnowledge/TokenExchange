@@ -1,4 +1,4 @@
-# Token Exchange for IdentityServer (RFC 8693)
+# OAuth Token Exchange (RFC 8693) for IdentityServer
 
 An implementation of OAuth token exchange ([RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html)) for IdentityServer4 and Duende IdentityServer. This implementation provides the required abstractions for token exchange with extensibility points to implement your own authorization rules, with default implementation covering an API to API scenario.
 
@@ -36,7 +36,7 @@ To configure a client application to use token exchange, you’ll need to allow 
 new Client
 {
     ClientId = "api1",
-    RequireClientSecret = false,
+    ClientSecrets = new[] {new Secret("secret".Sha256())},
     AllowedGrantTypes = new[] {"urn:ietf:params:oauth:grant-type:token-exchange"},
     AllowedScopes = new[] {"api2"}
 };
@@ -45,15 +45,16 @@ new Client
 A typical token exchange request looks like this (unencoded):
 
 ```HTTP
-POST /connet/token HTTP/1.1
+POST /connect/token HTTP/1.1
  Host: demo.identityserver.com
  Content-Type: application/x-www-form-urlencoded
 
  grant_type=urn:ietf:params:oauth:grant-type:token-exchange
  &scope=api2
+ &client_id=api1
+ &client_secret=secret
  &subject_token=accVkjcJyb4BWCxGsndESCJQbdFMogUC5PbRDqceLTC
- &subject_token_type=
-  urn:ietf:params:oauth:token-type:access_token
+ &subject_token_type=urn:ietf:params:oauth:token-type:access_token
 ```
 
 ## Default implementation – API to API delegation

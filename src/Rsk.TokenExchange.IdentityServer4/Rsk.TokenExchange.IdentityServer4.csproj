@@ -2,6 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Authors>Rock Solid Knowledge Ltd</Authors>
+        <Description>Token Exchange (RFC 8693) implementation for IdentityServer4.</Description>
+        <PackageProjectUrl>https://github.com/RockSolidKnowledge/TokenExchange</PackageProjectUrl>
+        <PackageReleaseNotes>https://github.com/RockSolidKnowledge/TokenExchange/releases</PackageReleaseNotes>
+        <Copyright>Copyright 2021 (c) Rock Solid Knowledge Ltd. All rights reserved.</Copyright>
+        <PackageTags>IdentityServer OAuth Token Exchange IdentityServer4</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +20,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Rsk.TokenExchange\Rsk.TokenExchange.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\icon.png" Pack="true" PackagePath="icon.png" />
     </ItemGroup>
 
 </Project>

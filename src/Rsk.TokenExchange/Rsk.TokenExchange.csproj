@@ -2,9 +2,16 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
-
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>Rock Solid Knowledge Ltd</Authors>
+    <Description>Token Exchange (RFC 8693) implementation for IdentityServer. This is the core library shared between the IdentityServer4 and Duende IdentityServer implementations.</Description>
+    <PackageProjectUrl>https://github.com/RockSolidKnowledge/TokenExchange</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/RockSolidKnowledge/TokenExchange/releases</PackageReleaseNotes>
+    <Copyright>Copyright 2021 (c) Rock Solid Knowledge Ltd. All rights reserved.</Copyright>
+    <PackageTags>IdentityServer OAuth Token Exchange</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
@@ -18,6 +25,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.11.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon.png" Pack="true" PackagePath="icon.png" />
   </ItemGroup>
 
 </Project>

@@ -86,6 +86,45 @@ The default implementation for claim generation:
 
 You can override this by registering your own implementation of `ITokenExchangeClaimsParser`.
 
+### Example tokens
+
+Original token payload, requested by "app" to talk to "api1":
+
+```json
+{
+  "iss": "http://localhost",
+  "sub": "123xyz",
+  "client_id": "app",
+  "aud": "api1",
+  "scope": [
+    "api1"
+  ],
+  "nbf": 1625215449,
+  "exp": 1625219049,
+  "iat": 1625215449,
+}
+```
+
+Exchanged token payload, requested by "api1" to talk to "api2", on behalf of "app" and the original user:
+
+```json
+{
+  "iss": "http://localhost",
+  "sub": "123xyz", // still acting on behalf of the original user
+  "client_id": "app", // still acting on behalf of the original client app
+  "aud": "api2",
+  "scope": [
+    "api2"
+  ],
+  "act": {
+    "client_id": "api1"
+  },
+  "nbf": 1625215465,
+  "exp": 1625219065,
+  "iat": 1625215465,
+}
+```
+
 ## Future
 
 We also have an implementation for multi-tenant token exchange, where a tenanted token can be swapped for a tenantless token. This can be useful for calling untenanted microservices. We will be open-sourcing this in the future.

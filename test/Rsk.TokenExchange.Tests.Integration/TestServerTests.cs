@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -100,8 +99,9 @@ namespace Rsk.TokenExchange.Tests.Integration
             // actor claim containing client app acting on their behalf
             token.Claims.Should().Contain(x => x.Type == "act");
             var actorClaim = token.Claims.First(x => x.Type == "act");
-            var actor = JsonConvert.DeserializeObject<Actor>(actorClaim.Value);
-            actor.ClientId.Should().Be(TestStartup.Api1.Name);
+            var actorClientId = JObject.Parse(actorClaim.Value)["client_id"];
+            actorClientId.Should().NotBeNull();
+            actorClientId.Value<string>().Should().Be(TestStartup.Api1.Name);
         }
 
         private async Task<string> TokenExchange()

@@ -110,8 +110,8 @@ Exchanged token payload, requested by "api1" to talk to "api2", on behalf of "ap
 ```json
 {
   "iss": "http://localhost",
-  "sub": "123xyz", // still acting on behalf of the original user
-  "client_id": "app", // still acting on behalf of the original client app
+  "sub": "123xyz",
+  "client_id": "app",
   "aud": "api2",
   "scope": [
     "api2"

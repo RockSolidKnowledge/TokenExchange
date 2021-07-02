@@ -30,9 +30,21 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
                 Raw = new NameValueCollection {{TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType}}
             }
         };
-        
+
         private TokenExchangeExtensionGrantValidator CreateSut()
             => new TokenExchangeExtensionGrantValidator(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
+        
+        private Mock<TokenExchangeExtensionGrantValidator> CreateMockedSut()
+        {
+            var sut = new Mock<TokenExchangeExtensionGrantValidator>(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger)
+            {
+                CallBase = true
+            };
+
+            sut.Setup(x => x.UpdateRequest(It.IsAny<ValidatedTokenRequest>(), It.IsAny<IEnumerable<Claim>>()));
+
+            return sut;
+        }
 
         [Fact]
         public void ctor_WhenParserIsNull_ExpectArgumentNullException()
@@ -71,7 +83,7 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
 
         [Fact]
         public void ValidateAsync_WhenContextIsNull_ExpectArgumentNullException()
-            => Assert.ThrowsAsync<ArgumentNullException>(() => CreateSut().ValidateAsync(null));
+            => Assert.ThrowsAsync<ArgumentNullException>(() => CreateMockedSut().Object.ValidateAsync(null));
 
         [Fact]
         public async Task ValidateAsync_WhenParseRequestThrowsTokenExchangeException_ExpectFailureResult()
@@ -81,9 +93,9 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
 
             mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
                 .Throws(new InvalidRequestException(expectedErrorMessage));
-            var sut = CreateSut();
+            var sut = CreateMockedSut();
 
-            await sut.ValidateAsync(context);
+            await sut.Object.ValidateAsync(context);
 
             context.Result.IsError.Should().BeTrue();
             context.Result.Error.Should().Be(expectedError);
@@ -102,9 +114,9 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
             mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
                 .ReturnsAsync(TokenExchangeValidationResult.Failure());
             
-            var sut = CreateSut();
+            var sut = CreateMockedSut();
 
-            await sut.ValidateAsync(context);
+            await sut.Object.ValidateAsync(context);
 
             context.Result.IsError.Should().BeTrue();
             context.Result.Error.Should().Be(expectedError);
@@ -127,9 +139,9 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
             mockClaimsParser.Setup(x => x.ParseSubject(claims, mockRequest.Object))
                 .Throws(exception);
             
-            var sut = CreateSut();
+            var sut = CreateMockedSut();
 
-            await sut.ValidateAsync(context);
+            await sut.Object.ValidateAsync(context);
 
             context.Result.IsError.Should().BeTrue();
             context.Result.Error.Should().Be(expectedError);
@@ -153,9 +165,9 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
             mockClaimsParser.Setup(x => x.ParseSubject(claims, mockRequest.Object))
                 .ReturnsAsync((string) null);
             
-            var sut = CreateSut();
+            var sut = CreateMockedSut();
 
-            await sut.ValidateAsync(context);
+            await sut.Object.ValidateAsync(context);
 
             context.Result.IsError.Should().BeTrue();
             context.Result.Error.Should().Be(expectedError);
@@ -181,9 +193,9 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
             mockClaimsParser.Setup(x => x.ParseClaims(claims, mockRequest.Object))
                 .ReturnsAsync(new[] {expectedAdditionalClaim});
 
-            var sut = CreateSut();
+            var sut = CreateMockedSut();
 
-            await sut.ValidateAsync(context);
+            await sut.Object.ValidateAsync(context);
 
             context.Result.IsError.Should().BeFalse();
             context.Result.Error.Should().BeNull();
@@ -197,6 +209,34 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
             
             context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == subjectClaim.Type && x.Value == subjectClaim.Value);
             context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == expectedAdditionalClaim.Type && x.Value == expectedAdditionalClaim.Value);
+            
+            sut.Verify(x => x.UpdateRequest(context.Request, It.IsAny<IEnumerable<Claim>>()), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateRequest_WhenRequestIsNull_ExpectArgumentNullException()
+        {
+            var sut = CreateSut();
+            Assert.Throws<ArgumentNullException>(() => sut.UpdateRequest(null, new List<Claim> {new Claim("client_id", "123")}));
+        }
+
+        [Fact]
+        public void UpdateRequest_WhenClaimsAreNull_ExpectArgumentNullException()
+        {
+            var sut = CreateSut();
+            Assert.Throws<ArgumentNullException>(() => sut.UpdateRequest(new ValidatedTokenRequest(), null));
+        }
+
+        [Fact]
+        public void UpdateRequest_ExpectRequestClientIdUpdate()
+        {
+            const string expectedClientId = "xyz";
+            var request = new ValidatedTokenRequest {ClientId = Guid.NewGuid().ToString()};
+
+            var sut = CreateSut();
+            sut.UpdateRequest(request, new[] {new Claim("client_id", expectedClientId)});
+
+            request.ClientId.Should().Be(expectedClientId);
         }
     }
 }

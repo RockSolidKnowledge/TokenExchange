@@ -103,10 +103,10 @@ namespace Rsk.TokenExchange.Tests.Parsers
         [Fact]
         public async Task ParseClaims_WhenClientIdIsDifferent_ExpectSubjectClaimsWithActorClaim()
         {
-            const string clientId = "api1";
-            const string actorClientId = "app1";
-            var claims = new List<Claim> {new Claim("client_id", actorClientId), new Claim("name", "alice")};
-            mockRequest.Setup(x => x.ClientId).Returns(clientId);
+            const string clientId = "api1"; // client of the original token
+            const string actorClientId = "app2"; // client making the token exchange request
+            var claims = new List<Claim> {new Claim("client_id", clientId), new Claim("name", "alice")};
+            mockRequest.Setup(x => x.ClientId).Returns(actorClientId);
             
             var sut = CreateSut();
             var parsedClaims = await sut.ParseClaims(claims, mockRequest.Object);
@@ -123,17 +123,17 @@ namespace Rsk.TokenExchange.Tests.Parsers
         [Fact]
         public async Task ParseClaims_WhenClientIdIsDifferentAndActorClaimAlreadyPresent_ExpectSubjectClaimsWithActorClaim()
         {
-            const string clientId = "api2";
-            const string actorClientId = "api1";
+            const string clientId = "api1"; // client of the original token
+            const string actorClientId = "api2"; // client making the token exchange request
             const string innerActor = "{\"client_id\": \"app1\"}";
 
             var claims = new List<Claim>
             {
-                new Claim("client_id", actorClientId),
+                new Claim("client_id", clientId),
                 new Claim("name", "alice"),
                 new Claim("act", innerActor)
             };
-            mockRequest.Setup(x => x.ClientId).Returns(clientId);
+            mockRequest.Setup(x => x.ClientId).Returns(actorClientId);
             
             var sut = CreateSut();
             var parsedClaims = await sut.ParseClaims(claims, mockRequest.Object);

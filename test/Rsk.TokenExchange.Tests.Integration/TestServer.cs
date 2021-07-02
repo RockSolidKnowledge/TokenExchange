@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Test;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Rsk.TokenExchange.IdentityServer4;
 
@@ -76,12 +78,24 @@ namespace Rsk.TokenExchange.Tests.Integration
                 .AddSigningCredential(
                     new ECDsaSecurityKey(ECDsa.Create(ECCurve.NamedCurves.nistP256)),
                     IdentityServerConstants.ECDsaSigningAlgorithm.ES256)
+                .AddProfileService<TestProfileService>()
                 .AddTokenExchange();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseIdentityServer();
+        }
+    }
+
+    public class TestProfileService : TestUserProfileService
+    {
+        public TestProfileService(TestUserStore users, ILogger<TestUserProfileService> logger) : base(users, logger) { }
+
+        public override Task GetProfileDataAsync(ProfileDataRequestContext context)
+        {
+            if (context.Subject.HasClaim(x => x.Type == "act")) context.IssuedClaims.Add(context.Subject.FindFirst("act"));
+            return base.GetProfileDataAsync(context);
         }
     }
 }

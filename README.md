@@ -57,6 +57,10 @@ POST /connect/token HTTP/1.1
  &subject_token_type=urn:ietf:params:oauth:token-type:access_token
 ```
 
+### Supporting the actor (act) claim
+
+To support the actor claim in generated tokens, you will need to update your IdentityServerprofile service to include this claim type. This can be done using `IssuedClaims`, to save updating your scopes.
+
 ## Default implementation – API to API delegation
 
 Our default implementation is designed for API gateways and microservices that receive an access token authorized by a user and need to call another API on behalf of that user.

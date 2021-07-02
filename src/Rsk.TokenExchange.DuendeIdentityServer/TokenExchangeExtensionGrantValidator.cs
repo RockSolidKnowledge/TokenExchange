@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
+using IdentityModel;
 using Microsoft.Extensions.Logging;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
@@ -71,11 +73,11 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
 
             // parse claims
             string subject;
-            IEnumerable<Claim> claims;
+            IList<Claim> claims;
             try
             {
                 subject = await claimsParser.ParseSubject(validationResult.Claims, tokenExchangeRequest);
-                claims = await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest);
+                claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).ToList();
             }
             catch (TokenExchangeException e)
             {
@@ -88,12 +90,27 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, "Unable to parse subject claim - IdentityServer requires subject claim for extension grants");
                 return;
             }
+
+            UpdateRequest(context.Request, claims);
             
             context.Result = new GrantValidationResult(
                 subject: subject,
                 authenticationMethod: GrantType,
                 claims: claims,
                 customResponse: CustomResponseParameters);
+        }
+        
+        /// <summary>
+        /// Update original token request to enable token exchange
+        /// </summary>
+        public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (claims == null) throw new ArgumentNullException(nameof(claims));
+
+            // update client_id to act as original client app
+            var clientId = claims.First(x => x.Type == JwtClaimTypes.ClientId).Value;
+            request.ClientId = clientId;
         }
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new Dictionary<string, object>

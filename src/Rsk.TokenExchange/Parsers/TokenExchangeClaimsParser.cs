@@ -35,13 +35,12 @@ namespace Rsk.TokenExchange
             var claims = subjectClaims.ToList();
             
             // add actor claim
-            var actorClientId = claims.FirstOrDefault(x => x.Type == "client_id")?.Value;
-            if (request.ClientId != actorClientId)
+            if (request.ClientId != claims.FirstOrDefault(x => x.Type == "client_id")?.Value)
             {
                 var previousActor = claims.FirstOrDefault(x => x.Type == "act");
                 if (previousActor != null) claims.Remove(previousActor);
                 
-                var actor = new Actor {ClientId = actorClientId, InnerActor = previousActor?.Value};
+                var actor = new Actor {ClientId = request.ClientId, InnerActor = previousActor?.Value};
                 claims.Add(new Claim(
                     "act",
                     JsonConvert.SerializeObject(actor, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore}),

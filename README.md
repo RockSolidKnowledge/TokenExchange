@@ -15,8 +15,8 @@ To learn more about token exchange and why it is useful for microservices and AP
 
 This library is available as a nuget package for both IdentityServer4 and Duende IdentityServer.
 
-- Rsk.TokenExchange.DuendeIdentityServer
-- Rsk.TokenExchange.IdentityServer4
+- [Rsk.TokenExchange.DuendeIdentityServer](https://www.nuget.org/packages/Rsk.TokenExchange.DuendeIdentityServer/)
+- [Rsk.TokenExchange.IdentityServer4](https://www.nuget.org/packages/Rsk.TokenExchange.IdentityServer4/)
 
 Once you have installed the correct nuget package, you can enable the token exchange grant type by using the `AddTokenExchange` extension on `IdentityServerBuilder`.
 

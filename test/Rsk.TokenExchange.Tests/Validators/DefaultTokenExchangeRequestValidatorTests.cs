@@ -11,7 +11,7 @@ namespace Rsk.TokenExchange.Tests.Validators
 {
     public class DefaultTokenExchangeRequestValidatorTests
     {
-        private Mock<ISubjectTokenValidator> mockSubjectTokenValidator = new Mock<ISubjectTokenValidator>();
+        private Mock<ISubjectTokenValidator> mockSubjectTokenValidator = new();
 
         private readonly Mock<ITokenExchangeRequest> mockRequest;
         private readonly Mock<ISubjectTokenValidationResult> mockSubjectTokenResponse;
@@ -24,7 +24,7 @@ namespace Rsk.TokenExchange.Tests.Validators
             mockRequest.Setup(x => x.ClientId).Returns(testClientId);
 
             mockSubjectTokenResponse = new Mock<ISubjectTokenValidationResult>();
-            mockSubjectTokenResponse.Setup(x => x.Claims).Returns(new[] {new Claim("aud", testClientId)});
+            mockSubjectTokenResponse.Setup(x => x.Claims).Returns([new Claim("aud", testClientId)]);
             
             mockSubjectTokenValidator.Setup(x => x.Validate(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(mockSubjectTokenResponse.Object);
@@ -87,7 +87,7 @@ namespace Rsk.TokenExchange.Tests.Validators
             mockRequest.Setup(x => x.ClientId).Returns(Guid.NewGuid().ToString);
             
             mockSubjectTokenResponse.Setup(x => x.IsValid).Returns(true);
-            mockSubjectTokenResponse.Setup(x => x.Claims).Returns(new[] {new Claim("aud", Guid.NewGuid().ToString())});
+            mockSubjectTokenResponse.Setup(x => x.Claims).Returns([new Claim("aud", Guid.NewGuid().ToString())]);
 
             var sut = CreateSut();
             var result = await sut.Validate(mockRequest.Object);

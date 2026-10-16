@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.Tests.Integration", "test\Rsk.TokenExchange.Tests.Integration\Rsk.TokenExchange.Tests.Integration.csproj", "{98215ED6-5DE9-42AD-BF08-176833F1F22C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.IdentityServer4", "src\Rsk.TokenExchange.IdentityServer4\Rsk.TokenExchange.IdentityServer4.csproj", "{D41B4200-C0A6-488A-9FC5-C0AD075A8228}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.Open.IdentityServer", "src\Rsk.TokenExchange.Open.IdentityServer\Rsk.TokenExchange.Open.IdentityServer.csproj", "{D41B4200-C0A6-488A-9FC5-C0AD075A8228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.IdentityServer4.Tests", "test\Rsk.TokenExchange.IdentityServer4.Tests\Rsk.TokenExchange.IdentityServer4.Tests.csproj", "{3B3A599B-0B55-4146-A96D-A6A4E1DC1E77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.Open.IdentityServer.Tests", "test\Rsk.TokenExchange.Open.IdentityServer.Tests\Rsk.TokenExchange.Open.IdentityServer.Tests.csproj", "{3B3A599B-0B55-4146-A96D-A6A4E1DC1E77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.DuendeIdentityServer", "src\Rsk.TokenExchange.DuendeIdentityServer\Rsk.TokenExchange.DuendeIdentityServer.csproj", "{4F826FC4-8C6B-43A0-9EB3-031400C01427}"
 EndProject

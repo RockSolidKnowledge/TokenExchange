@@ -1,21 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Authors>Rock Solid Knowledge Ltd</Authors>
-        <Description>Token Exchange (RFC 8693) implementation for IdentityServer4.</Description>
+        <Description>Token Exchange (RFC 8693) implementation for Open.IdentityServer.</Description>
         <PackageProjectUrl>https://github.com/RockSolidKnowledge/TokenExchange</PackageProjectUrl>
         <PackageReleaseNotes>https://github.com/RockSolidKnowledge/TokenExchange/releases</PackageReleaseNotes>
         <Copyright>Copyright 2021 (c) Rock Solid Knowledge Ltd. All rights reserved.</Copyright>
-        <PackageTags>IdentityServer OAuth Token Exchange IdentityServer4</PackageTags>
+        <PackageTags>IdentityServer OAuth Token Exchange IdentityServer4 Open.IdentityServer</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <PackageIcon>icon.png</PackageIcon>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>Rsk.TokenExchange.Open.IdentityServer</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IdentityServer4" Version="4.1.2" />
+        <PackageReference Include="Open.IdentityServer" Version="3.0.0" />
     </ItemGroup>
 
     <ItemGroup>

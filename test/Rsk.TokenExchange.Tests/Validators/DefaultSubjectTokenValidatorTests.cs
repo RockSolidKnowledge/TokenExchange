@@ -14,7 +14,7 @@ namespace Rsk.TokenExchange.Tests.Validators
 {
     public class DefaultSubjectTokenValidatorTests
     {
-        private Mock<ITokenValidatorAdaptor> mockTokenValidator = new Mock<ITokenValidatorAdaptor>();
+        private Mock<ITokenValidatorAdaptor> mockTokenValidator = new();
         private ILogger<ISubjectTokenValidator> logger = new NullLogger<ISubjectTokenValidator>();
 
         private const string validToken = "eyJ.eyJ";

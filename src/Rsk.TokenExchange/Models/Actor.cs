@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Rsk.TokenExchange
 {
@@ -12,21 +12,21 @@ namespace Rsk.TokenExchange
         /// The original issuer (iss) of exchanged token.
         /// Useful for cross-tenant/identity provider token exchange.
         /// </summary>
-        [JsonProperty("iss")]
+        [JsonPropertyName("iss")]
         public string Issuer { get; set; }
         
         /// <summary>
         /// The original client ID (client_id) of the exchanged token.
         /// Useful for tracking who originally requested the exchanged token. 
         /// </summary>
-        [JsonProperty("client_id")]
+        [JsonPropertyName("client_id")]
         public string ClientId { get; set; }
         
         /// <summary>
         /// The inner actor claim.
         /// Useful for multiple token exchange requests.
         /// </summary>
-        [JsonProperty("act")]
+        [JsonPropertyName("act")]
         public string InnerActor { get; set; }
         
     }

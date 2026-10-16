@@ -23,7 +23,10 @@ namespace Rsk.TokenExchange.Validators
         /// <inheritdoc />
         public async Task<ITokenExchangeValidationResult> Validate(ITokenExchangeRequest request)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
             // validate subject token is issued by IdentityServer
             var result = await subjectTokenValidator.Validate(request.SubjectToken, request.SubjectTokenType);

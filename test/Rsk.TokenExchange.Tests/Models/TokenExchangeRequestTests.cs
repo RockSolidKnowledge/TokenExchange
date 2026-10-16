@@ -10,7 +10,7 @@ namespace Rsk.TokenExchange.Tests.Models
 {
     public class TokenExchangeRequestTests
     {
-        private readonly NameValueCollection rawRequest = new NameValueCollection
+        private readonly NameValueCollection rawRequest = new()
         {
             {TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType},
             {TokenExchangeConstants.RequestParameters.SubjectToken, "eyJ.eyJ"},

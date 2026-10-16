@@ -17,9 +17,13 @@ namespace Rsk.TokenExchange
         /// <exception cref="InvalidRequestException">Throw on missing grant_type, subject_token, and subject_token_type.</exception>
         public TokenExchangeRequest(string clientId, NameValueCollection request)
         {
-            if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentNullException(nameof(clientId));
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new ArgumentNullException(nameof(clientId));
+            }
+
+            ArgumentNullException.ThrowIfNull(request);
+
             ClientId = clientId;
 
             // grant type must be urn:ietf:params:oauth:grant-type:token-exchange

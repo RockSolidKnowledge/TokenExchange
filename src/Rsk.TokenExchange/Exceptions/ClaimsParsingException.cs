@@ -16,8 +16,5 @@ namespace Rsk.TokenExchange.Exceptions
 
         /// <inheritdoc />
         public SubjectParsingException(string message, Exception inner) : base(message, inner) { }
-
-        /// <inheritdoc />
-        protected SubjectParsingException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

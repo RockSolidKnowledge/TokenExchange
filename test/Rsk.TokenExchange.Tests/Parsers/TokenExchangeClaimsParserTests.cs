@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Moq;
-using Newtonsoft.Json;
 using Rsk.TokenExchange.Exceptions;
 using Xunit;
 
@@ -14,9 +14,9 @@ namespace Rsk.TokenExchange.Tests.Parsers
 {
     public class TokenExchangeClaimsParserTests
     {
-        private readonly Mock<ITokenExchangeRequest> mockRequest = new Mock<ITokenExchangeRequest>();
+        private readonly Mock<ITokenExchangeRequest> mockRequest = new();
         
-        private TokenExchangeClaimsParser CreateSut() => new TokenExchangeClaimsParser();
+        private TokenExchangeClaimsParser CreateSut() => new();
 
         [Fact]
         public async Task ParseSubject_WhenSubjectClaimsAreNull_ExpectArgumentNullException()
@@ -115,7 +115,7 @@ namespace Rsk.TokenExchange.Tests.Parsers
             actor.Should().NotBeNull();
             actor?.ValueType.Should().Be(JsonClaimValueTypes.Json);
             
-            var parsedActor = JsonConvert.DeserializeObject<Actor>(actor?.Value);
+            var parsedActor = JsonSerializer.Deserialize<Actor>(actor?.Value);
             parsedActor.ClientId.Should().Be(actorClientId);
             parsedActor.InnerActor.Should().BeNull();
         }
@@ -141,10 +141,13 @@ namespace Rsk.TokenExchange.Tests.Parsers
             var actor = parsedClaims.FirstOrDefault(x => x.Type == "act");
             actor.Should().NotBeNull();
             actor?.ValueType.Should().Be(JsonClaimValueTypes.Json);
-            
-            var parsedActor = JsonConvert.DeserializeObject<Actor>(actor?.Value);
-            parsedActor.ClientId.Should().Be(actorClientId);
-            parsedActor.InnerActor.Should().Be(innerActor);
+
+            if (actor?.Value != null)
+            {
+                var parsedActor = JsonSerializer.Deserialize<Actor>(actor.Value);
+                parsedActor.ClientId.Should().Be(actorClientId);
+                parsedActor.InnerActor.Should().Be(innerActor);
+            }
         }
     }
 }

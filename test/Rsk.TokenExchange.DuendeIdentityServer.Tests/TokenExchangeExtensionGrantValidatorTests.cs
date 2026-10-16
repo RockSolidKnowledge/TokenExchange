@@ -18,12 +18,12 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
 {
     public class TokenExchangeExtensionGrantValidatorTests
     {
-        private Mock<ITokenExchangeRequestParser> mockParser = new Mock<ITokenExchangeRequestParser>();
-        private Mock<ITokenExchangeRequestValidator> mockRequestValidator = new Mock<ITokenExchangeRequestValidator>();
-        private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new Mock<ITokenExchangeClaimsParser>();
+        private Mock<ITokenExchangeRequestParser> mockParser = new();
+        private Mock<ITokenExchangeRequestValidator> mockRequestValidator = new();
+        private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new();
         private ILogger<TokenExchangeExtensionGrantValidator> logger = new NullLogger<TokenExchangeExtensionGrantValidator>();
 
-        private ExtensionGrantValidationContext context = new ExtensionGrantValidationContext
+        private ExtensionGrantValidationContext context = new()
         {
             Request = new ValidatedTokenRequest
             {
@@ -33,7 +33,7 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         };
 
         private TokenExchangeExtensionGrantValidator CreateSut()
-            => new TokenExchangeExtensionGrantValidator(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
+            => new(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
         
         private Mock<TokenExchangeExtensionGrantValidator> CreateMockedSut()
         {
@@ -83,8 +83,8 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         }
 
         [Fact]
-        public void ValidateAsync_WhenContextIsNull_ExpectArgumentNullException()
-            => Assert.ThrowsAsync<ArgumentNullException>(() => CreateMockedSut().Object.ValidateAsync(null));
+        public async Task ValidateAsync_WhenContextIsNull_ExpectArgumentNullException()
+            => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateMockedSut().Object.ValidateAsync(null));
 
         [Fact]
         public async Task ValidateAsync_WhenParseRequestThrowsTokenExchangeException_ExpectFailureResult()

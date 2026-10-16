@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
-using IdentityServer4.Validation;
+using Open.IdentityServer.Validation;
 using Rsk.TokenExchange.Validators.Adaptors;
 using TokenValidationResult = Rsk.TokenExchange.Validators.Adaptors.TokenValidationResult;
 
-namespace Rsk.TokenExchange.IdentityServer4
+namespace Rsk.TokenExchange.Open.IdentityServer
 {
     /// <summary>
-    /// Wrapper around IdentityServer4's ITokenValidator
+    /// Wrapper around Open.IdentityServer's ITokenValidator
     /// </summary>
     public class IdentityServerSubjectTokenValidator : ITokenValidatorAdaptor
     {

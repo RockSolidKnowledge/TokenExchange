@@ -21,11 +21,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '10.0.x'
-    - name: Fix Windows VM bug
-      shell: bash
-      if: matrix.os == 'windows-latest'
-      run: |
-        dotnet nuget locals all --clear
     - name: Restore
       run: dotnet restore
     - name: Build

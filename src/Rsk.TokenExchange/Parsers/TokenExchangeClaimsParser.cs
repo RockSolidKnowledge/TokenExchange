@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Newtonsoft.Json;
 using Rsk.TokenExchange.Exceptions;
 
 namespace Rsk.TokenExchange
@@ -43,7 +44,7 @@ namespace Rsk.TokenExchange
                 var actor = new Actor {ClientId = request.ClientId, InnerActor = previousActor?.Value};
                 claims.Add(new Claim(
                     "act",
-                    JsonConvert.SerializeObject(actor, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore}),
+                    JsonSerializer.Serialize(actor, new JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}),
                     JsonClaimValueTypes.Json));
             }
 

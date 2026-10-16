@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Rsk.TokenExchange.Tests.Integration
@@ -32,7 +32,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
-            var subjectToken = JObject.Parse(subjectTokenResponseString)["access_token"];
+            var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
             var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
             {
@@ -42,7 +42,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectToken, 
-                    subjectToken.Value<string>()),
+                    subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
                     TokenExchangeConstants.TokenTypes.AccessToken),
@@ -50,7 +50,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
             tokenExchangeResponse.IsSuccessStatusCode.Should().BeTrue();
             var tokenExchangeResponseString = await tokenExchangeResponse.Content.ReadAsStringAsync();
-            JObject.Parse(tokenExchangeResponseString)["access_token"].Should().NotBeNull();
+            GetStringProperty(tokenExchangeResponseString, "access_token").Should().NotBeNullOrEmpty();
         }
         
         [Fact]
@@ -67,7 +67,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
-            var subjectToken = JObject.Parse(subjectTokenResponseString)["access_token"];
+            var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
             var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
             {
@@ -77,7 +77,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectToken, 
-                    subjectToken.Value<string>()),
+                    subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
                     TokenExchangeConstants.TokenTypes.AccessToken),
@@ -99,9 +99,8 @@ namespace Rsk.TokenExchange.Tests.Integration
             // actor claim containing client app acting on their behalf
             token.Claims.Should().Contain(x => x.Type == "act");
             var actorClaim = token.Claims.First(x => x.Type == "act");
-            var actorClientId = JObject.Parse(actorClaim.Value)["client_id"];
-            actorClientId.Should().NotBeNull();
-            actorClientId.Value<string>().Should().Be(TestStartup.Api1.Name);
+            var actorClientId = GetStringProperty(actorClaim.Value, "client_id");
+            actorClientId.Should().Be(TestStartup.Api1.Name);
         }
 
         private async Task<string> TokenExchange()
@@ -117,7 +116,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
-            var subjectToken = JObject.Parse(subjectTokenResponseString)["access_token"];
+            var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
             var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
             {
@@ -127,7 +126,7 @@ namespace Rsk.TokenExchange.Tests.Integration
 
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectToken,
-                    subjectToken.Value<string>()),
+                    subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
                     TokenExchangeConstants.TokenTypes.AccessToken),
@@ -136,7 +135,13 @@ namespace Rsk.TokenExchange.Tests.Integration
             tokenExchangeResponse.IsSuccessStatusCode.Should().BeTrue();
             var tokenExchangeResponseString = await tokenExchangeResponse.Content.ReadAsStringAsync();
 
-            return JObject.Parse(tokenExchangeResponseString)["access_token"].Value<string>();
+            return GetStringProperty(tokenExchangeResponseString, "access_token");
+        }
+
+        private static string GetStringProperty(string json, string propertyName)
+        {
+            using var document = JsonDocument.Parse(json);
+            return document.RootElement.GetProperty(propertyName).GetString();
         }
     }
 }

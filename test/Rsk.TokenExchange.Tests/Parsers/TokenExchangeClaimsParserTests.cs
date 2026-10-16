@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Moq;
-using Newtonsoft.Json;
 using Rsk.TokenExchange.Exceptions;
 using Xunit;
 
@@ -115,7 +115,7 @@ namespace Rsk.TokenExchange.Tests.Parsers
             actor.Should().NotBeNull();
             actor?.ValueType.Should().Be(JsonClaimValueTypes.Json);
             
-            var parsedActor = JsonConvert.DeserializeObject<Actor>(actor?.Value);
+            var parsedActor = JsonSerializer.Deserialize<Actor>(actor?.Value);
             parsedActor.ClientId.Should().Be(actorClientId);
             parsedActor.InnerActor.Should().BeNull();
         }
@@ -142,7 +142,7 @@ namespace Rsk.TokenExchange.Tests.Parsers
             actor.Should().NotBeNull();
             actor?.ValueType.Should().Be(JsonClaimValueTypes.Json);
             
-            var parsedActor = JsonConvert.DeserializeObject<Actor>(actor?.Value);
+            var parsedActor = JsonSerializer.Deserialize<Actor>(actor?.Value);
             parsedActor.ClientId.Should().Be(actorClientId);
             parsedActor.InnerActor.Should().Be(innerActor);
         }

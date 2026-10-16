@@ -1,6 +1,6 @@
 # OAuth Token Exchange (RFC 8693) for IdentityServer
 
-An implementation of OAuth token exchange ([RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html)) for IdentityServer4 and Duende IdentityServer. This implementation provides the required abstractions for token exchange with extensibility points to implement your own authorization rules, with default implementation covering an API to API scenario.
+An implementation of OAuth token exchange ([RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html)) for [Open.IdentityServer](https://github.com/RockSolidKnowledge/Open.IdentityServer) and Duende IdentityServer. This implementation provides the required abstractions for token exchange with extensibility points to implement your own authorization rules, with default implementation covering an API to API scenario.
 
 This library includes:
 
@@ -13,10 +13,11 @@ To learn more about token exchange and why it is useful for microservices and AP
 
 ## Installation
 
-This library is available as a nuget package for both IdentityServer4 and Duende IdentityServer.
+This library is available as a nuget package for both Open.IdentityServer and Duende IdentityServer.
 
+- [Rsk.TokenExchange.Open.IdentityServer](https://www.nuget.org/packages/Rsk.TokenExchange.Open.IdentityServer/)
 - [Rsk.TokenExchange.DuendeIdentityServer](https://www.nuget.org/packages/Rsk.TokenExchange.DuendeIdentityServer/)
-- [Rsk.TokenExchange.IdentityServer4](https://www.nuget.org/packages/Rsk.TokenExchange.IdentityServer4/)
+
 
 Once you have installed the correct nuget package, you can enable the token exchange grant type by using the `AddTokenExchange` extension on `IdentityServerBuilder`.
 

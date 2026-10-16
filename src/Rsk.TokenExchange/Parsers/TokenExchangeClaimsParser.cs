@@ -21,7 +21,7 @@ namespace Rsk.TokenExchange
             ArgumentNullException.ThrowIfNull(subjectClaims);
 
             var subjectValues = subjectClaims.Where(x => x.Type == "sub").Select(x => x.Value).ToList();
-            if (1 < subjectValues.Count)
+            if (subjectValues.Count > 1)
             {
                 throw new SubjectParsingException("More than one subject claim present on token exchange request");
             }

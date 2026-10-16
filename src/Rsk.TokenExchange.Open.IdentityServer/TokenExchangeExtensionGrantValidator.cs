@@ -54,7 +54,10 @@ namespace Rsk.TokenExchange.Open.IdentityServer
             }
 
             // warn on no client auth
-            if (context.Request.Secret == null) logger.LogInformation("Recieved unauthenticated token exchange request");
+            if (context.Request.Secret == null)
+            {
+                logger.LogInformation("Received unauthenticated token exchange request");
+            }
 
             // parse request
             ITokenExchangeRequest tokenExchangeRequest;
@@ -110,15 +113,14 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         /// </summary>
         public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (claims == null) throw new ArgumentNullException(nameof(claims));
+            ArgumentNullException.ThrowIfNull(request);
+            ArgumentNullException.ThrowIfNull(claims);
 
             // update client_id to act as original client app
             var clientId = claims.First(x => x.Type == JwtClaimTypes.ClientId).Value;
             request.ClientId = clientId;
         }
         
-        private static readonly Dictionary<string, object> CustomResponseParameters = new Dictionary<string, object>
-            {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
+        private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }
 }

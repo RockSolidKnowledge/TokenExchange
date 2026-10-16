@@ -18,10 +18,13 @@ namespace Rsk.TokenExchange
         /// <exception cref="SubjectParsingException">Throws when more than one subject claim is present in the subject token claims.</exception>
         public virtual Task<string> ParseSubject(IEnumerable<Claim> subjectClaims, ITokenExchangeRequest request)
         {
-            if (subjectClaims == null) throw new ArgumentNullException(nameof(subjectClaims));
+            ArgumentNullException.ThrowIfNull(subjectClaims);
 
             var subjectValues = subjectClaims.Where(x => x.Type == "sub").Select(x => x.Value).ToList();
-            if (1 < subjectValues.Count) throw new SubjectParsingException("More than one subject claim present on token exchange request");
+            if (1 < subjectValues.Count)
+            {
+                throw new SubjectParsingException("More than one subject claim present on token exchange request");
+            }
 
             return Task.FromResult(subjectValues.FirstOrDefault());
         }
@@ -30,8 +33,8 @@ namespace Rsk.TokenExchange
         /// <returns>Returns the subject claims along with an actor claim when client_id != subject token client_id</returns>
         public virtual Task<IEnumerable<Claim>> ParseClaims(IEnumerable<Claim> subjectClaims, ITokenExchangeRequest request)
         {
-            if (subjectClaims == null) throw new ArgumentNullException(nameof(subjectClaims));
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            ArgumentNullException.ThrowIfNull(subjectClaims);
+            ArgumentNullException.ThrowIfNull(request);
 
             var claims = subjectClaims.ToList();
             

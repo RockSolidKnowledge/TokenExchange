@@ -17,8 +17,5 @@ namespace Rsk.TokenExchange.Exceptions
 
         /// <inheritdoc />
         public InvalidRequestException(string message, Exception inner) : base(message, inner) { }
-
-        /// <inheritdoc />
-        protected InvalidRequestException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

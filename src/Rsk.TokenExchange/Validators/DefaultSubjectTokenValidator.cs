@@ -26,8 +26,15 @@ namespace Rsk.TokenExchange.Validators
         /// <inheritdoc />
         public async Task<ISubjectTokenValidationResult> Validate(string token, string tokenType)
         {
-            if (string.IsNullOrWhiteSpace(token)) throw new ArgumentNullException(nameof(token));
-            if (string.IsNullOrWhiteSpace(tokenType)) throw new ArgumentNullException(nameof(tokenType));
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            if (string.IsNullOrWhiteSpace(tokenType))
+            {
+                throw new ArgumentNullException(nameof(tokenType));
+            }
 
             if (tokenType != TokenExchangeConstants.TokenTypes.AccessToken)
             {

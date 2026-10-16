@@ -8,9 +8,9 @@ namespace Rsk.TokenExchange.Tests.Parsers
 {
     public class TokenExchangeRequestParserTests
     {
-        private readonly TokenExchangeRequestParser sut = new TokenExchangeRequestParser();
+        private readonly TokenExchangeRequestParser sut = new();
 
-        private readonly NameValueCollection parameters = new NameValueCollection
+        private readonly NameValueCollection parameters = new()
         {
             {TokenExchangeConstants.RequestParameters.GrantType, TokenExchangeConstants.GrantType},
             {TokenExchangeConstants.RequestParameters.SubjectToken, "eyJ.eyJ"},

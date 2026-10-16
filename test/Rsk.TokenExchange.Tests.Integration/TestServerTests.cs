@@ -23,19 +23,17 @@ namespace Rsk.TokenExchange.Tests.Integration
         {
             var client = factory.CreateClient();
 
-            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new []
-            {
+            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
                 new KeyValuePair<string, string>("client_id", TestStartup.Client.ClientId),
-                new KeyValuePair<string, string>("scope", TestStartup.Api1.Name) 
-            }));
+                new KeyValuePair<string, string>("scope", TestStartup.Api1.Name)
+            ]));
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
             var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
-            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
-            {
+            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", TokenExchangeConstants.GrantType),
                 new KeyValuePair<string, string>("client_id", TestStartup.Api1.Name),
                 new KeyValuePair<string, string>("scope", TestStartup.Api2.Name),
@@ -45,8 +43,8 @@ namespace Rsk.TokenExchange.Tests.Integration
                     subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
-                    TokenExchangeConstants.TokenTypes.AccessToken),
-            }));
+                    TokenExchangeConstants.TokenTypes.AccessToken)
+            ]));
 
             tokenExchangeResponse.IsSuccessStatusCode.Should().BeTrue();
             var tokenExchangeResponseString = await tokenExchangeResponse.Content.ReadAsStringAsync();
@@ -58,19 +56,17 @@ namespace Rsk.TokenExchange.Tests.Integration
         {
             var client = factory.CreateClient();
 
-            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new []
-            {
+            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
                 new KeyValuePair<string, string>("client_id", TestStartup.Client.ClientId),
-                new KeyValuePair<string, string>("scope", TestStartup.Api2.Name) 
-            }));
+                new KeyValuePair<string, string>("scope", TestStartup.Api2.Name)
+            ]));
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
             var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
-            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
-            {
+            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", TokenExchangeConstants.GrantType),
                 new KeyValuePair<string, string>("client_id", TestStartup.Api1.Name),
                 new KeyValuePair<string, string>("scope", TestStartup.Api2.Name),
@@ -80,8 +76,8 @@ namespace Rsk.TokenExchange.Tests.Integration
                     subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
-                    TokenExchangeConstants.TokenTypes.AccessToken),
-            }));
+                    TokenExchangeConstants.TokenTypes.AccessToken)
+            ]));
 
             tokenExchangeResponse.IsSuccessStatusCode.Should().BeFalse();
         }
@@ -107,19 +103,17 @@ namespace Rsk.TokenExchange.Tests.Integration
         {
             var client = factory.CreateClient();
 
-            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
-            {
+            var subjectTokenResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
                 new KeyValuePair<string, string>("client_id", TestStartup.Client.ClientId),
                 new KeyValuePair<string, string>("scope", TestStartup.Api1.Name)
-            }));
+            ]));
 
             subjectTokenResponse.IsSuccessStatusCode.Should().BeTrue();
             var subjectTokenResponseString = await subjectTokenResponse.Content.ReadAsStringAsync();
             var subjectToken = GetStringProperty(subjectTokenResponseString, "access_token");
 
-            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent(new[]
-            {
+            var tokenExchangeResponse = await client.PostAsync("/connect/token", new FormUrlEncodedContent([
                 new KeyValuePair<string, string>("grant_type", TokenExchangeConstants.GrantType),
                 new KeyValuePair<string, string>("client_id", TestStartup.Api1.Name),
                 new KeyValuePair<string, string>("scope", TestStartup.Api2.Name),
@@ -129,8 +123,8 @@ namespace Rsk.TokenExchange.Tests.Integration
                     subjectToken),
                 new KeyValuePair<string, string>(
                     TokenExchangeConstants.RequestParameters.SubjectTokenType,
-                    TokenExchangeConstants.TokenTypes.AccessToken),
-            }));
+                    TokenExchangeConstants.TokenTypes.AccessToken)
+            ]));
 
             tokenExchangeResponse.IsSuccessStatusCode.Should().BeTrue();
             var tokenExchangeResponseString = await tokenExchangeResponse.Content.ReadAsStringAsync();

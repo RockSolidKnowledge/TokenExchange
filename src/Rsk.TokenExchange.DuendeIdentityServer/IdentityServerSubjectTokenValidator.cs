@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Validation;
 using Rsk.TokenExchange.Validators.Adaptors;
@@ -24,7 +25,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
         /// <inheritdoc />
         public async Task<TokenValidationResult> ValidateAccessToken(string token)
         {
-            var result = await tokenValidator.ValidateAccessTokenAsync(token);
+            var result = await tokenValidator.ValidateAccessTokenAsync(token, expectedScope: null, CancellationToken.None);
             return new TokenValidationResult(result.IsError, result.Claims);
         }
     }

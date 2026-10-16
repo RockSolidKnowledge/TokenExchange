@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
-using IdentityModel;
 using Microsoft.Extensions.Logging;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
@@ -46,8 +46,10 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
         public string GrantType => TokenExchangeConstants.GrantType;
 
         /// <inheritdoc />
-        public async Task ValidateAsync(ExtensionGrantValidationContext context)
+        public async Task ValidateAsync(ExtensionGrantValidationContext context, CancellationToken cancellationToken = default)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
             // warn on no client auth
             if (context.Request.Secret == null) logger.LogInformation("Recieved unauthenticated token exchange request");
 
@@ -109,7 +111,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
             if (claims == null) throw new ArgumentNullException(nameof(claims));
 
             // update client_id to act as original client app
-            var clientId = claims.First(x => x.Type == JwtClaimTypes.ClientId).Value;
+            var clientId = claims.First(x => x.Type == "client_id").Value;
             request.ClientId = clientId;
         }
         

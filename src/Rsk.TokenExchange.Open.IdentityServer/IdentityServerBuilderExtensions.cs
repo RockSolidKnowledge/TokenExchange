@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Rsk.TokenExchange.Configuration;
 using Rsk.TokenExchange.Validators.Adaptors;
 
-namespace Rsk.TokenExchange.IdentityServer4
+namespace Rsk.TokenExchange.Open.IdentityServer
 {
     /// <summary>
     /// Token exchange registrations for IIdentityServerBuilder
@@ -10,7 +10,7 @@ namespace Rsk.TokenExchange.IdentityServer4
     public static class IdentityServerBuilderExtensions
     {
         /// <summary>
-        /// Adds the default token exchange registrations for IdentityServer4.
+        /// Adds the default token exchange registrations for Open.IdentityServer.
         /// Uses the default authorization policy, designed for token exchange between microservices.
         /// </summary>
         public static IIdentityServerBuilder AddTokenExchange(this IIdentityServerBuilder builder)

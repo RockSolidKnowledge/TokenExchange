@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using FluentAssertions;
-using IdentityServer4.Models;
-using IdentityServer4.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using Open.IdentityServer.Models;
+using Open.IdentityServer.Validation;
 using Xunit;
 
-namespace Rsk.TokenExchange.IdentityServer4.Tests
+namespace Rsk.TokenExchange.Open.IdentityServer.Tests
 {
     public class IdentityServerBuilderExtensionTests
     {

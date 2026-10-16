@@ -5,15 +5,15 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
-using IdentityServer4.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Open.IdentityServer.Validation;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
 using Xunit;
 
-namespace Rsk.TokenExchange.IdentityServer4.Tests
+namespace Rsk.TokenExchange.Open.IdentityServer.Tests
 {
     public class TokenExchangeExtensionGrantValidatorTests
     {
@@ -82,8 +82,8 @@ namespace Rsk.TokenExchange.IdentityServer4.Tests
         }
 
         [Fact]
-        public void ValidateAsync_WhenContextIsNull_ExpectArgumentNullException()
-            => Assert.ThrowsAsync<ArgumentNullException>(() => CreateMockedSut().Object.ValidateAsync(null));
+        public async Task ValidateAsync_WhenContextIsNull_ExpectArgumentNullException()
+            => await Assert.ThrowsAsync<ArgumentNullException>(() => CreateMockedSut().Object.ValidateAsync(null));
 
         [Fact]
         public async Task ValidateAsync_WhenParseRequestThrowsTokenExchangeException_ExpectFailureResult()

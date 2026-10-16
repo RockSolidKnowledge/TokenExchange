@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer4.Models;
-using IdentityServer4.Validation;
+using Open.IdentityServer.Models;
+using Open.IdentityServer.Validation;
 using Microsoft.Extensions.Logging;
+using Open.IdentityServer;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
 
-namespace Rsk.TokenExchange.IdentityServer4
+namespace Rsk.TokenExchange.Open.IdentityServer
 {
     /// <summary>
     /// Extension grant validator for OAuth Token Exchange (RFC 8693).
@@ -48,6 +48,11 @@ namespace Rsk.TokenExchange.IdentityServer4
         /// <inheritdoc />
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             // warn on no client auth
             if (context.Request.Secret == null) logger.LogInformation("Recieved unauthenticated token exchange request");
 

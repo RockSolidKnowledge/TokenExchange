@@ -16,6 +16,10 @@
 
     <ItemGroup>
         <PackageReference Include="Duende.IdentityServer" Version="8.0.10" />
+        <PackageReference Include="MinVer" Version="8.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

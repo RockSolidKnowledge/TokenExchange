@@ -32,14 +32,14 @@ namespace Rsk.TokenExchange.Validators
             var result = await subjectTokenValidator.Validate(request.SubjectToken, request.SubjectTokenType);
 
             // validate that the requester is an intended audience of the subject token
-            var audiences = result.Claims.Where(x => x.Type == "aud").ToList();
-            var clientId = result.Claims.FirstOrDefault(x => x.Type == "client_id");
-            if (audiences.All(x => x.Value != request.ClientId) && clientId?.Value != request.ClientId)
+            var audiences = result.Claims?.Where(x => x.Type == "aud").ToList();
+            var clientId = result.Claims?.FirstOrDefault(x => x.Type == "client_id");
+            if (audiences != null && audiences.All(x => x.Value != request.ClientId) && clientId?.Value != request.ClientId)
             {
                 return TokenExchangeValidationResult.Failure("Requester must be a recipient of the subject token");
             }
 
-            return result.IsValid 
+            return result.IsValid
                 ? TokenExchangeValidationResult.Success(result.Claims)
                 : TokenExchangeValidationResult.Failure("Invalid subject token");
         }

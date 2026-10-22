@@ -98,6 +98,23 @@ namespace Rsk.TokenExchange.Tests.Validators
         }
 
         [Fact]
+        public async Task Validate_WhenValidateReturnsInvalidAndExpectedClaimsAreNull_ExpectIsValidToBeFalse()
+        {
+            const string validClientId = "app1";
+            
+            mockRequest.Setup(x => x.ClientId).Returns(validClientId);
+            
+            mockSubjectTokenResponse.Setup(x => x.IsValid).Returns(false);
+            mockSubjectTokenResponse.Setup(x => x.Claims).Returns((IEnumerable<Claim>)null);
+
+            var sut = CreateSut();
+            var result = await sut.Validate(mockRequest.Object);
+
+            result.IsValid.Should().BeFalse();
+            result.Claims.Should().BeNull();
+        }
+        
+        [Fact]
         public async Task Validate_WhenSubjectTokenIsValidAndAuthorizedWithCorrectClientId_ExpectSuccessResult()
         {
             const string validClientId = "app1";

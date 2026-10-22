@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.DuendeIde
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.DuendeIdentityServer.Tests", "test\Rsk.TokenExchange.DuendeIdentityServer.Tests\Rsk.TokenExchange.DuendeIdentityServer.Tests.csproj", "{3E83C48D-10DD-4D09-8CEF-7C59A6137BE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsk.TokenExchange.DuendeIdentityServerV7", "src\Rsk.TokenExchange.DuendeIdentityServerV7\Rsk.TokenExchange.DuendeIdentityServerV7.csproj", "{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,18 @@ Global
 		{3E83C48D-10DD-4D09-8CEF-7C59A6137BE1}.Release|x64.Build.0 = Release|Any CPU
 		{3E83C48D-10DD-4D09-8CEF-7C59A6137BE1}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E83C48D-10DD-4D09-8CEF-7C59A6137BE1}.Release|x86.Build.0 = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|x64.Build.0 = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Debug|x86.Build.0 = Debug|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|x64.ActiveCfg = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|x64.Build.0 = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +141,7 @@ Global
 		{3B3A599B-0B55-4146-A96D-A6A4E1DC1E77} = {F38DA7DB-4210-45B7-B867-F6C50F39220C}
 		{4F826FC4-8C6B-43A0-9EB3-031400C01427} = {DC14404A-0CE3-49FE-81ED-4A6F502EF297}
 		{3E83C48D-10DD-4D09-8CEF-7C59A6137BE1} = {F38DA7DB-4210-45B7-B867-F6C50F39220C}
+		{8A8A3B78-5D6E-4F9E-A254-F7DFCC846BBC} = {DC14404A-0CE3-49FE-81ED-4A6F502EF297}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7923610-956B-4237-816F-34504444C9B4}

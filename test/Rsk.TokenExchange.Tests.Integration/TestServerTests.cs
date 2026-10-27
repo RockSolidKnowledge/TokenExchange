@@ -131,6 +131,20 @@ namespace Rsk.TokenExchange.Tests.Integration
 
             return GetStringProperty(tokenExchangeResponseString, "access_token");
         }
+        
+        [Fact]
+        public async Task TokenExchange_ClientIdClaim_ShouldBeRequestingClient()
+        {
+            var accessToken = await TokenExchange();
+
+            JsonWebToken token = new JsonWebTokenHandler().ReadJsonWebToken(accessToken);
+            var payload = Microsoft.IdentityModel.Tokens.Base64UrlEncoder.Decode(token.EncodedPayload);
+
+            token.GetClaim("client_id").Value.Should().Be(
+                TestStartup.ApiClient.ClientId,
+                "RFC 8693 §4.3 says client_id is the client that requested the token. Issued token payload: {0}",
+                payload);
+        }
 
         private static string GetStringProperty(string json, string propertyName)
         {

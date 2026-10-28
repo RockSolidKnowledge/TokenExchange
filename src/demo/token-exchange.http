@@ -1,0 +1,61 @@
+﻿### Variables
+@authority = https://localhost:5001
+@client1_id = client-1
+@client1_secret = secret
+@client1_redirect = https://localhost:5002/signin-oidc
+
+### 1) Authorize request for client-1 (authorization code flow)
+# .http files can't drive the login UI. Open this URL in a browser, sign in,
+# then copy the `code` query parameter from the redirect to the next request below.
+# https://localhost:5001/connect/authorize?client_id=client-1&redirect_uri=https%3A%2F%2Flocalhost%3A5002%2Fsignin-oidc&response_type=code&scope=openid%20profile%20api1&state=abc123
+GET {{authority}}/connect/authorize?client_id={{client1_id}}&redirect_uri={{client1_redirect}}&response_type=code&scope=openid%20profile%20api1&state=abc123
+
+### Paste the authorization code here
+@auth_code = PASTE_AUTH_CODE_HERE
+
+### 2) Exchange the code for a token (client-1)
+POST {{authority}}/connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&client_id={{client1_id}}&client_secret={{client1_secret}}&code={{auth_code}}&redirect_uri={{client1_redirect}}
+
+> {%
+    client.global.set("subject_token", response.body.access_token);
+%}
+
+### 3) Token exchange: swap client-1's access token for a token scoped to api2
+POST {{authority}}/connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&client_id={{client1_id}}&client_secret={{client1_secret}}&subject_token={{subject_token}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_token_type=urn:ietf:params:oauth:token-type:access_token&scope=api2
+
+> {%
+    client.global.set("exchanged_token", response.body.access_token);
+%}
+
+### Variables for the requesting client (client-2, e.g. an API doing on-behalf-of)
+@client2_id = client-2
+@client2_secret = secret
+
+### 4) ISSUE REPRO: client-2 exchanges client-1's token
+# RFC 8693 §1 / §4.3: the client making the exchange request (client-2) is the
+# client, so `client_id` in the issued token should be "client-2".
+POST {{authority}}/connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&client_id={{client2_id}}&client_secret={{client2_secret}}&subject_token={{subject_token}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_token_type=urn:ietf:params:oauth:token-type:access_token&scope=api2
+
+> {%
+    client.global.set("exchanged_token_client2", response.body.access_token);
+%}
+
+### Variables for the second requesting client (client-3)
+@client3_id = client-3
+@client3_secret = secret
+
+### 5) ISSUE REPRO: nested `act`
+# Run step 4 first. Its token (scope api2) has aud=client-3, so client-3 may exchange it
+POST {{authority}}/connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&client_id={{client3_id}}&client_secret={{client3_secret}}&subject_token={{exchanged_token_client2}}&subject_token_type=urn:ietf:params:oauth:token-type:access_token&requested_token_type=urn:ietf:params:oauth:token-type:access_token&scope=api2

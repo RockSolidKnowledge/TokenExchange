@@ -213,31 +213,5 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
             
             sut.Verify(x => x.UpdateRequest(context.Request, It.IsAny<IEnumerable<Claim>>()), Times.Once);
         }
-
-        [Fact]
-        public void UpdateRequest_WhenRequestIsNull_ExpectArgumentNullException()
-        {
-            var sut = CreateSut();
-            Assert.Throws<ArgumentNullException>(() => sut.UpdateRequest(null, new List<Claim> {new Claim("client_id", "123")}));
-        }
-
-        [Fact]
-        public void UpdateRequest_WhenClaimsAreNull_ExpectArgumentNullException()
-        {
-            var sut = CreateSut();
-            Assert.Throws<ArgumentNullException>(() => sut.UpdateRequest(new ValidatedTokenRequest(), null));
-        }
-
-        [Fact]
-        public void UpdateRequest_ExpectRequestClientIdUpdate()
-        {
-            const string expectedClientId = "xyz";
-            var request = new ValidatedTokenRequest {ClientId = Guid.NewGuid().ToString()};
-
-            var sut = CreateSut();
-            sut.UpdateRequest(request, new[] {new Claim("client_id", expectedClientId)});
-
-            request.ClientId.Should().Be(expectedClientId);
-        }
     }
 }

@@ -111,12 +111,6 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
         /// </summary>
         public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
         {
-            ArgumentNullException.ThrowIfNull(request);
-            ArgumentNullException.ThrowIfNull(claims);
-
-            // update client_id to act as original client app
-            var clientId = claims.First(x => x.Type == JwtClaimTypes.ClientId).Value;
-            request.ClientId = clientId;
         }
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};

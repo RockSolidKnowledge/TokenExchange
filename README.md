@@ -126,8 +126,6 @@ Exchanged token payload, requested by "api1" to talk to "api2", on behalf of "ap
 }
 ```
 
-## Future
-
-We also have an implementation for multi-tenant token exchange, where a tenanted token can be swapped for a tenantless token. This can be useful for calling untenanted microservices. We will be open-sourcing this in the future.
+## Feature Requests
 
 If you have any feature requests, please reach out in the issue tracker; otherwise, get in contact at [identityserver.com](https://www.identityserver.com).

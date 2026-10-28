@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -125,13 +126,17 @@ namespace Rsk.TokenExchange.Tests.Parsers
         {
             const string clientId = "api1"; // client of the original token
             const string actorClientId = "api2"; // client making the token exchange request
-            const string innerActor = "{\"client_id\": \"app1\"}";
+
+            var innerActor = new Actor
+            {
+                ClientId = "client-1"
+            };
 
             var claims = new List<Claim>
             {
                 new Claim("client_id", clientId),
                 new Claim("name", "alice"),
-                new Claim("act", innerActor)
+                new Claim("act", JsonSerializer.Serialize(innerActor, new JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}), JsonClaimValueTypes.Json)
             };
             mockRequest.Setup(x => x.ClientId).Returns(actorClientId);
             
@@ -146,7 +151,7 @@ namespace Rsk.TokenExchange.Tests.Parsers
             {
                 var parsedActor = JsonSerializer.Deserialize<Actor>(actor.Value);
                 parsedActor.ClientId.Should().Be(actorClientId);
-                parsedActor.InnerActor.Should().Be(innerActor);
+                parsedActor.InnerActor.Should().BeEquivalentTo(innerActor);
             }
         }
     }

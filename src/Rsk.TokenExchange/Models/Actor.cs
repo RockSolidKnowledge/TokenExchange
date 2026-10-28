@@ -27,7 +27,7 @@ namespace Rsk.TokenExchange
         /// Useful for multiple token exchange requests.
         /// </summary>
         [JsonPropertyName("act")]
-        public string InnerActor { get; set; }
+        public Actor InnerActor { get; set; }
         
     }
 }

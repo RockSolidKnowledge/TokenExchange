@@ -41,10 +41,15 @@ namespace Rsk.TokenExchange
             // add actor claim
             if (request.ClientId != claims.FirstOrDefault(x => x.Type == "client_id")?.Value)
             {
-                var previousActor = claims.FirstOrDefault(x => x.Type == "act");
-                if (previousActor != null) claims.Remove(previousActor);
+                var previousActorClaim = claims.FirstOrDefault(x => x.Type == "act");
+                if (previousActorClaim != null)
+                {
+                    claims.Remove(previousActorClaim);
+                }
                 
-                var actor = new Actor {ClientId = request.ClientId, InnerActor = previousActor?.Value};
+                var previousActor = previousActorClaim != null ? JsonSerializer.Deserialize<Actor>(previousActorClaim.Value) : null;
+                
+                var actor = new Actor {ClientId = request.ClientId, InnerActor = previousActor};
                 claims.Add(new Claim(
                     "act",
                     JsonSerializer.Serialize(actor, new JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}),

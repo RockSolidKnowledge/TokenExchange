@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -125,13 +126,17 @@ namespace Rsk.TokenExchange.Tests.Parsers
         {
             const string clientId = "api1"; // client of the original token
             const string actorClientId = "api2"; // client making the token exchange request
-            const string innerActor = "{\"client_id\": \"app1\"}";
+
+            var innerActor = new Actor
+            {
+                ClientId = "client-1"
+            };
 
             var claims = new List<Claim>
             {
                 new Claim("client_id", clientId),
                 new Claim("name", "alice"),
-                new Claim("act", innerActor)
+                new Claim("act", JsonSerializer.Serialize(innerActor, new JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}), JsonClaimValueTypes.Json)
             };
             mockRequest.Setup(x => x.ClientId).Returns(actorClientId);
             
@@ -146,7 +151,57 @@ namespace Rsk.TokenExchange.Tests.Parsers
             {
                 var parsedActor = JsonSerializer.Deserialize<Actor>(actor.Value);
                 parsedActor.ClientId.Should().Be(actorClientId);
-                parsedActor.InnerActor.Should().Be(innerActor);
+                parsedActor.InnerActor.Should().BeEquivalentTo(innerActor);
+            }
+        }
+        
+        [Fact]
+        public async Task ParseClaims_WhenActorContainsNestedActorWhichContainsNestedActor_ShouldCorrectlyNestActorWithinOutputActorClaim()
+        {
+            const string clientId = "api1"; // client of the original token
+            const string actorClientId = "api2"; // client making the token exchange request
+
+            var innerActor = new Actor
+            {
+                ClientId = "client-1",
+                InnerActor = new Actor
+                {
+                    ClientId = "client-2",
+                    InnerActor = new Actor
+                    {
+                        ClientId = "client-3",
+                        InnerActor = new Actor
+                        {
+                            ClientId = "client-4",
+                            InnerActor = new Actor
+                            {
+                                ClientId = "client-5"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var claims = new List<Claim>
+            {
+                new("client_id", clientId),
+                new("name", "alice"),
+                new("act", JsonSerializer.Serialize(innerActor, new JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull}), JsonClaimValueTypes.Json)
+            };
+            mockRequest.Setup(x => x.ClientId).Returns(actorClientId);
+            
+            var sut = CreateSut();
+            var parsedClaims = await sut.ParseClaims(claims, mockRequest.Object);
+            
+            var actor = parsedClaims.FirstOrDefault(x => x.Type == "act");
+            actor.Should().NotBeNull();
+            actor?.ValueType.Should().Be(JsonClaimValueTypes.Json);
+
+            if (actor?.Value != null)
+            {
+                var parsedActor = JsonSerializer.Deserialize<Actor>(actor.Value);
+                parsedActor.ClientId.Should().Be(actorClientId);
+                parsedActor.InnerActor.Should().BeEquivalentTo(innerActor);
             }
         }
     }

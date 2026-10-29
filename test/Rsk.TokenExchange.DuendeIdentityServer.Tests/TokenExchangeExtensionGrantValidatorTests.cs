@@ -21,6 +21,7 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         private Mock<ITokenExchangeRequestParser> mockParser = new();
         private Mock<ITokenExchangeRequestValidator> mockRequestValidator = new();
         private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new();
+        private Mock<IExtensionGrantValidatorClaimsFilter> mockClaimsFilter = new();
         private ILogger<TokenExchangeExtensionGrantValidator> logger = new NullLogger<TokenExchangeExtensionGrantValidator>();
 
         private ExtensionGrantValidationContext context = new()
@@ -33,11 +34,18 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         };
 
         private TokenExchangeExtensionGrantValidator CreateSut()
-            => new(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
+        {
+            mockClaimsFilter?.Setup(x => x.ShouldIncludeClaim(It.IsAny<Claim>()))
+                .Returns<Claim>(claim => claim.Type != "sub" && claim.Type != "idp" && claim.Type != "auth_time");
+            return new(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, mockClaimsFilter?.Object, logger);
+        }
         
         private Mock<TokenExchangeExtensionGrantValidator> CreateMockedSut()
         {
-            var sut = new Mock<TokenExchangeExtensionGrantValidator>(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger)
+            mockClaimsFilter?.Setup(x => x.ShouldIncludeClaim(It.IsAny<Claim>()))
+                .Returns<Claim>(claim => claim.Type != "sub" && claim.Type != "idp" && claim.Type != "auth_time");
+
+            var sut = new Mock<TokenExchangeExtensionGrantValidator>(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, mockClaimsFilter?.Object, logger)
             {
                 CallBase = true
             };
@@ -65,6 +73,13 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
         public void ctor_WhenClaimsParserIsNull_ExpectArgumentNullException()
         {
             mockClaimsParser = null;
+            Assert.Throws<ArgumentNullException>(CreateSut);
+        }
+
+        [Fact]
+        public void ctor_WhenClaimsFilterIsNull_ExpectArgumentNullException()
+        {
+            mockClaimsFilter = null;
             Assert.Throws<ArgumentNullException>(CreateSut);
         }
         

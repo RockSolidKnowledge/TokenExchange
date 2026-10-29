@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Duende.IdentityModel;
 using Duende.IdentityServer.Models;
@@ -21,6 +20,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServerV7
         private readonly ITokenExchangeRequestParser parser;
         private readonly ITokenExchangeRequestValidator requestValidator;
         private readonly ITokenExchangeClaimsParser claimsParser;
+        private readonly IExtensionGrantValidatorClaimsFilter claimsFilter;
         private readonly ILogger<TokenExchangeExtensionGrantValidator> logger;
 
         /// <summary>
@@ -29,16 +29,19 @@ namespace Rsk.TokenExchange.DuendeIdentityServerV7
         /// <param name="parser">Parser for understanding token exchange requests.</param>
         /// <param name="requestValidator">Validator for the token exchange request.</param>
         /// <param name="claimsParser">Parser for generating the subject claim and additional claims for the subject.</param>
+        /// <param name="claimsFilter">Filter for claims passed into the grant validation result.</param>
         /// <param name="logger">The logger.</param>
         public TokenExchangeExtensionGrantValidator(
             ITokenExchangeRequestParser parser,
             ITokenExchangeRequestValidator requestValidator,
             ITokenExchangeClaimsParser claimsParser,
+            IExtensionGrantValidatorClaimsFilter claimsFilter,
             ILogger<TokenExchangeExtensionGrantValidator> logger)
         {
             this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
             this.requestValidator = requestValidator ?? throw new ArgumentNullException(nameof(requestValidator));
             this.claimsParser = claimsParser ?? throw new ArgumentNullException(nameof(claimsParser));
+            this.claimsFilter = claimsFilter ?? throw new ArgumentNullException(nameof(claimsFilter));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -83,7 +86,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServerV7
             try
             {
                 subject = await claimsParser.ParseSubject(validationResult.Claims, tokenExchangeRequest);
-                claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).ToList();
+                claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).Where(claimsFilter.ShouldIncludeClaim).ToList();
             }
             catch (TokenExchangeException e)
             {
@@ -118,7 +121,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServerV7
             var clientId = claims.First(x => x.Type == JwtClaimTypes.ClientId).Value;
             request.ClientId = clientId;
         }
-        
+
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }
 }

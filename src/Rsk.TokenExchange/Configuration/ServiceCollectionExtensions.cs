@@ -17,6 +17,7 @@ namespace Rsk.TokenExchange.Configuration
             services.AddTransient<ITokenExchangeRequestValidator, DefaultTokenExchangeRequestValidator>();
             services.AddTransient<ISubjectTokenValidator, DefaultSubjectTokenValidator>();
             services.AddTransient<ITokenExchangeClaimsParser, TokenExchangeClaimsParser>();
+            services.AddTransient<IExtensionGrantValidatorClaimsFilter, ExtensionGrantValidatorClaimsFilter>();
             
             return services;
         }

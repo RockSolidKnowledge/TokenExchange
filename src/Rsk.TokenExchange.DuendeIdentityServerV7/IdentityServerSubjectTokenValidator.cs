@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Validation;
 using Rsk.TokenExchange.Validators.Adaptors;

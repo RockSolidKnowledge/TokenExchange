@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Security.Claims;
-using FluentAssertions;
+using AwesomeAssertions;
 using Rsk.TokenExchange.Validators;
 using Xunit;
 

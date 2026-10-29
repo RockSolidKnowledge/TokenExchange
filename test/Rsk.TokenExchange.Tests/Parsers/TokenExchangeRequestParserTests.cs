@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Specialized;
-using FluentAssertions;
+using AwesomeAssertions;
 using Rsk.TokenExchange.Exceptions;
 using Xunit;
 

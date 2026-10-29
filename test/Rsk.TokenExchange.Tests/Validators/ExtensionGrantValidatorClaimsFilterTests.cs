@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
-using FluentAssertions;
+using AwesomeAssertions;
 using Xunit;
 
 namespace Rsk.TokenExchange.Tests.Validators

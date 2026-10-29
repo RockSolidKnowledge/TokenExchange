@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using Open.IdentityServer;
 using Open.IdentityServer.Models;
 using Rsk.TokenExchange;
 using System.Collections.Generic;

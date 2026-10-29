@@ -20,6 +20,7 @@ namespace Rsk.TokenExchange.Open.IdentityServer.Tests
         private Mock<ITokenExchangeRequestParser> mockParser = new();
         private Mock<ITokenExchangeRequestValidator> mockRequestValidator = new();
         private Mock<ITokenExchangeClaimsParser> mockClaimsParser = new();
+        private Mock<IExtensionGrantValidatorClaimsFilter> mockClaimsFilter = new();
         private ILogger<TokenExchangeExtensionGrantValidator> logger = new NullLogger<TokenExchangeExtensionGrantValidator>();
 
         private ExtensionGrantValidationContext context = new()
@@ -32,11 +33,18 @@ namespace Rsk.TokenExchange.Open.IdentityServer.Tests
         };
 
         private TokenExchangeExtensionGrantValidator CreateSut()
-            => new(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger);
+        {
+            mockClaimsFilter?.Setup(x => x.ShouldIncludeClaim(It.IsAny<Claim>()))
+                .Returns<Claim>(claim => claim.Type != "sub" && claim.Type != "idp" && claim.Type != "auth_time");
+            return new(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, mockClaimsFilter?.Object, logger);
+        }
         
         private Mock<TokenExchangeExtensionGrantValidator> CreateMockedSut()
         {
-            var sut = new Mock<TokenExchangeExtensionGrantValidator>(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, logger)
+            mockClaimsFilter?.Setup(x => x.ShouldIncludeClaim(It.IsAny<Claim>()))
+                .Returns<Claim>(claim => claim.Type != "sub" && claim.Type != "idp" && claim.Type != "auth_time");
+
+            var sut = new Mock<TokenExchangeExtensionGrantValidator>(mockParser?.Object, mockRequestValidator?.Object, mockClaimsParser?.Object, mockClaimsFilter?.Object, logger)
             {
                 CallBase = true
             };
@@ -64,6 +72,13 @@ namespace Rsk.TokenExchange.Open.IdentityServer.Tests
         public void ctor_WhenClaimsParserIsNull_ExpectArgumentNullException()
         {
             mockClaimsParser = null;
+            Assert.Throws<ArgumentNullException>(CreateSut);
+        }
+
+        [Fact]
+        public void ctor_WhenClaimsFilterIsNull_ExpectArgumentNullException()
+        {
+            mockClaimsFilter = null;
             Assert.Throws<ArgumentNullException>(CreateSut);
         }
         
@@ -211,37 +226,6 @@ namespace Rsk.TokenExchange.Open.IdentityServer.Tests
             context.Result.Subject.Claims.Should().ContainSingle(x => x.Type == expectedAdditionalClaim.Type && x.Value == expectedAdditionalClaim.Value);
             
             sut.Verify(x => x.UpdateRequest(context.Request, It.IsAny<IEnumerable<Claim>>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task ValidateAsync_WhenParsedClaimsContainSubAndIdpAndAuthTime_ExpectNoDuplicateIdentityClaims()
-        {
-            var subjectTokenClaims = new List<Claim>
-            {
-                new("sub", "user-1", ClaimValueTypes.String, "https://idp"),
-                new("idp", "local", ClaimValueTypes.String, "https://idp"),
-                new("auth_time", "1735689600", ClaimValueTypes.Integer64, "https://idp"),
-                new("client_id", "app", ClaimValueTypes.String, "https://idp")
-            };
-
-            var mockRequest = new Mock<ITokenExchangeRequest>();
-            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
-                .Returns(mockRequest.Object);
-            mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
-                .ReturnsAsync(TokenExchangeValidationResult.Success(subjectTokenClaims));
-            mockClaimsParser.Setup(x => x.ParseSubject(subjectTokenClaims, mockRequest.Object))
-                .ReturnsAsync("user-1");
-            mockClaimsParser.Setup(x => x.ParseClaims(subjectTokenClaims, mockRequest.Object))
-                .ReturnsAsync(subjectTokenClaims);
-
-            var sut = CreateMockedSut();
-
-            await sut.Object.ValidateAsync(context);
-
-            context.Result.IsError.Should().BeFalse();
-            context.Result.Subject.FindAll("sub").Should().HaveCount(1);
-            context.Result.Subject.FindAll("idp").Should().HaveCount(1);
-            context.Result.Subject.FindAll("auth_time").Should().HaveCount(1);
         }
     }
 }

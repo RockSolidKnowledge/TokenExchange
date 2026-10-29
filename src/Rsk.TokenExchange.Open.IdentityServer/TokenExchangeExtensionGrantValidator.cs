@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Open.IdentityServer.Models;
 using Open.IdentityServer.Validation;
 using Microsoft.Extensions.Logging;
-using Open.IdentityServer;
 using Rsk.TokenExchange.Exceptions;
 using Rsk.TokenExchange.Validators;
 
@@ -20,6 +19,7 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         private readonly ITokenExchangeRequestParser parser;
         private readonly ITokenExchangeRequestValidator requestValidator;
         private readonly ITokenExchangeClaimsParser claimsParser;
+        private readonly IExtensionGrantValidatorClaimsFilter claimsFilter;
         private readonly ILogger<TokenExchangeExtensionGrantValidator> logger;
 
         /// <summary>
@@ -28,16 +28,19 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         /// <param name="parser">Parser for understanding token exchange requests.</param>
         /// <param name="requestValidator">Validator for the token exchange request.</param>
         /// <param name="claimsParser">Parser for generating the subject claim and additional claims for the subject.</param>
+        /// <param name="claimsFilter">Filter for claims passed into the grant validation result.</param>
         /// <param name="logger">The logger.</param>
         public TokenExchangeExtensionGrantValidator(
             ITokenExchangeRequestParser parser,
             ITokenExchangeRequestValidator requestValidator,
             ITokenExchangeClaimsParser claimsParser,
+            IExtensionGrantValidatorClaimsFilter claimsFilter,
             ILogger<TokenExchangeExtensionGrantValidator> logger)
         {
             this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
             this.requestValidator = requestValidator ?? throw new ArgumentNullException(nameof(requestValidator));
             this.claimsParser = claimsParser ?? throw new ArgumentNullException(nameof(claimsParser));
+            this.claimsFilter = claimsFilter ?? throw new ArgumentNullException(nameof(claimsFilter));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -85,8 +88,7 @@ namespace Rsk.TokenExchange.Open.IdentityServer
             try
             {
                 subject = await claimsParser.ParseSubject(validationResult.Claims, tokenExchangeRequest);
-                claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).ToList();
-                claims = claims.Where(ShouldIncludeClaim).ToList();
+                claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).Where(claimsFilter.ShouldIncludeClaim).ToList();
             }
             catch (TokenExchangeException e)
             {
@@ -115,16 +117,6 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
         {
         }
-
-        /// <summary>
-        /// Determines whether a claim should be included in the token exchange response.
-        /// </summary>
-        /// <param name="claim"></param>
-        /// <returns></returns>
-        protected virtual bool ShouldIncludeClaim(Claim claim)
-            => claim.Type != JwtClaimTypes.Subject
-               && claim.Type != JwtClaimTypes.IdentityProvider
-               && claim.Type != JwtClaimTypes.AuthenticationTime;
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }

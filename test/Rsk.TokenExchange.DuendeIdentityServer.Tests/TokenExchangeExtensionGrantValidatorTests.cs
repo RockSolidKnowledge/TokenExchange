@@ -213,5 +213,36 @@ namespace Rsk.TokenExchange.Tests.IdentityServer
             
             sut.Verify(x => x.UpdateRequest(context.Request, It.IsAny<IEnumerable<Claim>>()), Times.Once);
         }
+
+        [Fact]
+        public async Task ValidateAsync_WhenParsedClaimsContainSubAndIdpAndAuthTime_ExpectNoDuplicateIdentityClaims()
+        {
+            var subjectTokenClaims = new List<Claim>
+            {
+                new("sub", "user-1", ClaimValueTypes.String, "https://idp"),
+                new("idp", "local", ClaimValueTypes.String, "https://idp"),
+                new("auth_time", "1735689600", ClaimValueTypes.Integer64, "https://idp"),
+                new("client_id", "app", ClaimValueTypes.String, "https://idp")
+            };
+
+            var mockRequest = new Mock<ITokenExchangeRequest>();
+            mockParser.Setup(x => x.Parse(context.Request.ClientId, context.Request.Raw))
+                .Returns(mockRequest.Object);
+            mockRequestValidator.Setup(x => x.Validate(It.IsAny<ITokenExchangeRequest>()))
+                .ReturnsAsync(TokenExchangeValidationResult.Success(subjectTokenClaims));
+            mockClaimsParser.Setup(x => x.ParseSubject(subjectTokenClaims, mockRequest.Object))
+                .ReturnsAsync("user-1");
+            mockClaimsParser.Setup(x => x.ParseClaims(subjectTokenClaims, mockRequest.Object))
+                .ReturnsAsync(subjectTokenClaims);
+
+            var sut = CreateMockedSut();
+
+            await sut.Object.ValidateAsync(context);
+
+            context.Result.IsError.Should().BeFalse();
+            context.Result.Subject.FindAll("sub").Should().HaveCount(1);
+            context.Result.Subject.FindAll("idp").Should().HaveCount(1);
+            context.Result.Subject.FindAll("auth_time").Should().HaveCount(1);
+        }
     }
 }

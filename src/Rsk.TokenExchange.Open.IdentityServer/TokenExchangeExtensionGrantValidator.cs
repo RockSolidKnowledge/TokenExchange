@@ -86,6 +86,7 @@ namespace Rsk.TokenExchange.Open.IdentityServer
             {
                 subject = await claimsParser.ParseSubject(validationResult.Claims, tokenExchangeRequest);
                 claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).ToList();
+                claims = claims.Where(ShouldIncludeClaim).ToList();
             }
             catch (TokenExchangeException e)
             {
@@ -114,6 +115,17 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
         {
         }
+
+        /// <summary>
+        /// Determines if a parsed subject-token claim should be forwarded to <see cref="GrantValidationResult"/>.
+        /// </summary>
+        /// <param name="claim">The parsed claim from the subject token.</param>
+        /// <returns><c>true</c> if the claim should be included; otherwise <c>false</c>.</returns>
+        // GrantValidationResult creates these from its own parameters.
+        protected virtual bool ShouldIncludeClaim(Claim claim)
+            => claim.Type != "sub"
+               && claim.Type != "idp"
+               && claim.Type != "auth_time";
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }

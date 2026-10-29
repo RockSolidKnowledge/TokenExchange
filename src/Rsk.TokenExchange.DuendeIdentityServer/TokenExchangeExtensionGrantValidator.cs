@@ -84,6 +84,7 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
             {
                 subject = await claimsParser.ParseSubject(validationResult.Claims, tokenExchangeRequest);
                 claims = (await claimsParser.ParseClaims(validationResult.Claims, tokenExchangeRequest)).ToList();
+                claims = claims.Where(ShouldIncludeClaim).ToList();
             }
             catch (TokenExchangeException e)
             {
@@ -112,6 +113,16 @@ namespace Rsk.TokenExchange.DuendeIdentityServer
         public virtual void UpdateRequest(ValidatedTokenRequest request, IEnumerable<Claim> claims)
         {
         }
+
+        /// <summary>
+        /// Determines whether a claim should be included in the token exchange response.
+        /// </summary>
+        /// <param name="claim"></param>
+        /// <returns></returns>
+        protected virtual bool ShouldIncludeClaim(Claim claim)
+            => claim.Type != JwtClaimTypes.Subject
+               && claim.Type != JwtClaimTypes.IdentityProvider
+               && claim.Type != JwtClaimTypes.AuthenticationTime;
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }

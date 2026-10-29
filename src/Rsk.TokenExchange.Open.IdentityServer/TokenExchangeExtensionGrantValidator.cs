@@ -117,15 +117,14 @@ namespace Rsk.TokenExchange.Open.IdentityServer
         }
 
         /// <summary>
-        /// Determines if a parsed subject-token claim should be forwarded to <see cref="GrantValidationResult"/>.
+        /// Determines whether a claim should be included in the token exchange response.
         /// </summary>
-        /// <param name="claim">The parsed claim from the subject token.</param>
-        /// <returns><c>true</c> if the claim should be included; otherwise <c>false</c>.</returns>
-        // GrantValidationResult creates these from its own parameters.
+        /// <param name="claim"></param>
+        /// <returns></returns>
         protected virtual bool ShouldIncludeClaim(Claim claim)
-            => claim.Type != "sub"
-               && claim.Type != "idp"
-               && claim.Type != "auth_time";
+            => claim.Type != JwtClaimTypes.Subject
+               && claim.Type != JwtClaimTypes.IdentityProvider
+               && claim.Type != JwtClaimTypes.AuthenticationTime;
         
         private static readonly Dictionary<string, object> CustomResponseParameters = new() {{TokenExchangeConstants.ResponseParameters.IssuedTokenType, TokenExchangeConstants.TokenTypes.AccessToken}};
     }

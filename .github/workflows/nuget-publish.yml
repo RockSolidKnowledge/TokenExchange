@@ -1,0 +1,66 @@
+# Publishes NuGet packages to NuGet.org using trusted publishing.
+# Triggers when a version tag push causes the .NET CI workflow to complete successfully.
+# Requires reviewer approval for the nuget-publish environment
+
+name: Publish NuGet Packages
+
+on:
+  workflow_run:
+    workflows: [".NET"]
+    types: [completed]
+
+jobs:
+  check-tag:
+    name: Check version tag
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      is-version-tag: ${{ steps.check.outputs.is-version-tag }}
+    steps:
+      - name: Check if triggered by a version tag
+        id: check
+        run: |
+          if [[ "${{ github.event.workflow_run.head_branch }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "is-version-tag=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-version-tag=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    name: Publish to NuGet.org
+    runs-on: ubuntu-latest
+    needs: check-tag
+    if: needs.check-tag.outputs.is-version-tag == 'true'
+
+    environment: nuget-publish
+
+    permissions:
+      id-token: write 
+      contents: read
+
+    steps:
+      - name: Download NuGet packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nupkg
+          path: nuget/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+            user: ${{ secrets.NUGET_USER }}
+
+      - name: NuGet push
+        run: |
+            dotnet nuget push "nuget/**/*.nupkg" \
+            --api-key ${{steps.login.outputs.NUGET_API_KEY}} \
+            --source "https://api.nuget.org/v3/index.json" \
+            --skip-duplicate

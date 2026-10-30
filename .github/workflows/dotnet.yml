@@ -1,40 +1,47 @@
+# Builds the project, runs tests and creates NuGet packages.
+# Triggers on pushes to main and version tags, and pull requests targeting main.
+
 name: .NET
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-
-    strategy:
+    strategy: 
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-    - name: Restore
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Pack
-      if: matrix.os == 'ubuntu-latest'
-      run: dotnet pack -c Release
-    - name: upload artifact
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: nupkg
-        path: '**/*.nupkg'
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run build script
+        run: bash ./build.sh
+
+      - name: Upload NuGet packages
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: nuget/
+          if-no-files-found: error

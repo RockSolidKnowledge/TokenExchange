@@ -46,3 +46,9 @@ jobs:
       with:
         name: nupkg
         path: '**/*.nupkg'
+    - name: upload symbols
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: snupkg
+        path: '**/*.snupkg'
